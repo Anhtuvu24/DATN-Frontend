@@ -1,68 +1,40 @@
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /*line-height: 1.5;*/
+  /*font-weight: 400;*/
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  /*color-scheme: light dark;*/
+  /*color: rgba(255, 255, 255, 0.87);*/
+  /*background-color: #242424;*/
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+  /*font-synthesis: none;*/
+  /*text-rendering: optimizeLegibility;*/
+  /*-webkit-font-smoothing: antialiased;*/
+  /*-moz-osx-font-smoothing: grayscale;*/
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
+  /*color*/
+  --main-color: #EC1C2A;
+  --disable-color: #919EABCC;
+  --active-color: #637381;
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+  /*icon color*/
+  --main-icon-color: #637381;
+  --disable-icon-color: #919EABCC;
+  --hover-color: #091E420F;
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
+  /*backgroud color*/
+  --main-background-color: #FFF;
+  --second-background-color: #F7F8F9;
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+  /*Text color*/
+  --main-text-color: #172B4D;
+  --white-text-color: #FFFFFF;
+  --second-text-color: #212B36;
+  --third-text-color: #637381;
+  --text-danger: #AE2E24;
+  --text-warning: #A54800;
+  --text-warning-inverse: #172B4D;
+  --text-success: #216E4E;
+  --text-disabled: #091E424F;
 }

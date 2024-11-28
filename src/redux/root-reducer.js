@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
-import App from 'src/redux/app/reducer'
-import main from 'src/redux/main/reducers'
+import App from '../utils/Auth/index'
+import main from '../redux/main/reducers'
 
 const appReducer = combineReducers({
   App,

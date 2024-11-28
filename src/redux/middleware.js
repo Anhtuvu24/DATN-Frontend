@@ -1,12 +1,11 @@
 import axios from 'axios'
-import { CommonTypes } from './docbase/action_types'
 
 const errorStatus = [ 500]
 const notHas404Label = ['data', 'page', 'org', 'folder']
 
 export function callAPIMiddleware({ dispatch, getState }) {
   return next => action => {
-    const { types, callAPI, required = [] = () => true, payload = {} } = action
+    const { types, callAPI, required = [], payload = {} } = action
 
     if (!types) {
       return next(action)

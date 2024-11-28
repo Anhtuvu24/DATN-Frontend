@@ -1,27 +1,30 @@
 import React, { lazy, Suspense } from 'react'
 import { Route, Redirect, BrowserRouter as Router, Switch, useLocation } from 'react-router-dom'
-import Loader from 'src/components/loader/loader.js'
-import ErrorBoundary from './ErrorBoundary'
-import { PUBLIC_ROUTE } from './route.constants'
-import Auth from 'src/utils/Auth'
+
+import { PUBLIC_ROUTE } from './route.contants'
+import Auth from './utils/Auth/index'
 import { QueryParamProvider } from 'use-query-params'
 import { ReactRouter5Adapter } from 'use-query-params/adapters/react-router-5'
 import { parse, stringify } from 'query-string'
 
+// Components
+import Loader from './components/loader'
+import ErrorBoundary from './ErrorBoundary'
+const PrivateScreen = lazy(() => import('./pages/PrivateScreens/index.jsx'))
+
 const publicRoutes = []
 
 function PrivateRoute({ children, ...rest }) {
-    let location = useLocation()
-    const isLoggedIn = Auth.isLoggedIn()
-    if (isLoggedIn) return <Route {...rest}>{children}</Route>
-    return (
-        <Redirect
-            to={{
-                pathname: '/login',
-                state: { from: location },
-            }}
-        />
-    )
+    // const isLoggedIn = Auth.isLoggedIn()
+    // if (isLoggedIn) return <Route {...rest}>{children}</Route>
+    return <Route {...rest}>{children}</Route>
+    // return (
+    //     <Redirect
+    //         to={{
+    //             pathname: '/login',
+    //         }}
+    //     />
+    // )
 }
 
 export default function Routes() {
@@ -46,7 +49,7 @@ export default function Routes() {
                                 </Route>
                             ))}
                             <PrivateRoute path='/'>
-                                {/*<Dashboard />*/}
+                                <PrivateScreen />
                             </PrivateRoute>
                             {/*<Route component={Page404} />*/}
                         </Switch>
