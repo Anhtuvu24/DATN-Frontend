@@ -1,6 +1,6 @@
 import React, { lazy, Suspense } from 'react'
-import {Avatar, Badge} from 'antd';
-import {Route, Switch} from "react-router-dom";
+import { Avatar, Badge } from 'antd';
+import { Route, Switch } from "react-router-dom";
 
 // Components
 import Dashboard from "../Dashboard/";

@@ -12,19 +12,24 @@ import Loader from './components/loader'
 import ErrorBoundary from './ErrorBoundary'
 const PrivateScreen = lazy(() => import('./pages/PrivateScreens/index.jsx'))
 
-const publicRoutes = []
+const publicRoutes = [
+    {
+        path: '/login',
+        component: lazy(() => import('../src/pages/Login')),
+        exact: true,
+    },
+]
 
 function PrivateRoute({ children, ...rest }) {
-    // const isLoggedIn = Auth.isLoggedIn()
-    // if (isLoggedIn) return <Route {...rest}>{children}</Route>
-    return <Route {...rest}>{children}</Route>
-    // return (
-    //     <Redirect
-    //         to={{
-    //             pathname: '/login',
-    //         }}
-    //     />
-    // )
+    const isLoggedIn = Auth.isLoggedIn()
+    if (isLoggedIn) return <Route {...rest}>{children}</Route>
+    return (
+        <Redirect
+            to={{
+                pathname: '/login',
+            }}
+        />
+    )
 }
 
 export default function Routes() {

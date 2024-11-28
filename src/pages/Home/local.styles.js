@@ -35,4 +35,18 @@ export const HomeWrapper = styled.div`
       }
     }
   }
+  .ant-dropdown-menu-item {
+    > span {
+      text-align: left;
+    }
+  }
+`
+
+export const MoreOption = styled.div`
+  > svg {
+    &:hover {
+      fill: var(--active-color);
+      cursor: pointer;
+    }
+  }
 `
