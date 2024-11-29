@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Form } from "antd";
 
 export const HomeWrapper = styled.div`
   min-width: 800px;
@@ -48,5 +49,13 @@ export const MoreOption = styled.div`
       fill: var(--active-color);
       cursor: pointer;
     }
+  }
+`
+
+export const FormWrapper = styled(Form)`
+  .ant-upload-wrapper {
+    display: flex;
+    justify-content: center;
+    height: 102px;
   }
 `

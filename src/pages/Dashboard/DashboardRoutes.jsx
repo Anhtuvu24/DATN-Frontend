@@ -5,11 +5,11 @@ import {Route, Switch, useRouteMatch} from "react-router-dom";
 import Loader from '../../components/loader'
 
 const privateRoutes = [
-    // {
-    //     path: 'home',
-    //     component: lazy(() => import('../src/pages/Home')),
-    //     exact: true,
-    // },
+    {
+        path: 'project/:id',
+        component: lazy(() => import('../Project')),
+        exact: true,
+    },
 ]
 
 function DashboardRoutes() {

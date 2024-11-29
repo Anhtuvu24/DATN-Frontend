@@ -11,7 +11,12 @@ export default function AppProvider({ children }) {
           token: {
             colorPrimary: '#EC1C2A',
             borderRadius: 4,
-          }
+          },
+          components: {
+              Splitter: {
+                  splitBarSize: 4,
+              },
+          },
         }}
         locale={locale1}
     >

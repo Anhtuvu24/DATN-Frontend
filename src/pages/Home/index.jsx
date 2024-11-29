@@ -1,5 +1,6 @@
-import React from 'react';
-import { Button, Input, Select, Space, Table, Dropdown } from "antd";
+import React, { useState } from 'react';
+import { Button, Input, Select, Space, Table, Dropdown, Modal, Form, Upload } from "antd";
+import { PlusOutlined } from '@ant-design/icons';
 import { MdOutlineSearch, MdKeyboardArrowDown } from "react-icons/md";
 import { FaStar, FaRegStar  } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
@@ -11,7 +12,7 @@ import MainLayout from "../../components/MainLayout";
 import logoCVS from '../../assets/images/logo-cvs.svg';
 
 // Styles
-import { HomeWrapper, MoreOption } from './local.styles';
+import { HomeWrapper, MoreOption, FormWrapper } from './local.styles';
 import { ContentLayouWrapper } from "../../components/MainLayout/local.styles.js";
 
 const options = [
@@ -143,45 +144,178 @@ const data = [
     },
 ];
 
+const { Option } = Select;
 
+const normFile = (e) => {
+    if (Array.isArray(e)) {
+        return e;
+    }
+    return e?.fileList;
+};
 
 function Home() {
-    return (
-        <ContentLayouWrapper>
-            <HomeWrapper>
-                <div className={'headerWrapper'}>
-                    <h1>Projects</h1>
-                    <Button type={"primary"}>Create project</Button>
-                </div>
-                <div className={'searchsWrapper'}>
-                    <Input placeholder="Search projects" suffix={<MdOutlineSearch fontSize={20} color={'#637381'} />}/>
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [form] = Form.useForm();
+    const [fileList, setFileList] = useState([]);
+
+    const handleChangeUpload = ({ fileList: newFileList }) => {
+        setFileList(newFileList);
+    };
+    const onLeadChange = (value) => {
+        form.setFieldsValue({
+            lead: value,
+        });
+    };
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleOk = (values) => {
+        setIsModalOpen(false);
+        form.resetFields();
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+
+    const renderContentModal = () => {
+        return (
+            <FormWrapper form={form} onFinish={handleOk}>
+                <Form.Item name='icon' valuePropName="icon" getValueFromEvent={normFile}>
+                    <Upload
+                        accept='.jpg,.png,.jpeg'
+                        listType="picture-card"
+                        showUploadList={{
+                            showPreviewIcon: false,
+                        }}
+                        maxCount={1}
+                        beforeUpload={() => false}
+                        fileList={fileList}
+                        onChange={handleChangeUpload}
+                    >
+                        {fileList.length >= 1 ? null : (
+                            <button
+                                style={{
+                                    border: 0,
+                                    background: 'none',
+                                }}
+                                type="button"
+                            >
+                                <PlusOutlined />
+                                <div
+                                    style={{
+                                        marginTop: 8,
+                                    }}
+                                >
+                                    Icon
+                                </div>
+                            </button>
+                        )}
+                    </Upload>
+                </Form.Item>
+                <Form.Item
+                    name='name'
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <Input placeholder={'Project name'} />
+                </Form.Item>
+                <Form.Item
+                    name='projectKey'
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <Input placeholder={'Project key'} />
+                </Form.Item>
+                <Form.Item name='description'>
+                    <Input.TextArea placeholder={'Description'} />
+                </Form.Item>
+                <Form.Item
+                    name="lead"
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
                     <Select
-                        mode="multiple"
+                        placeholder="Select a lead"
+                        onChange={onLeadChange}
+                        allowClear
                         suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}
-                        placeholder="select one country"
-                        defaultValue={['china']}
-                        // onChange={handleChange}
-                        options={options}
-                        optionRender={(option) => (
-                            <Space>
+                    >
+                        <Option value="male">male</Option>
+                        <Option value="female">female</Option>
+                        <Option value="other">other</Option>
+                    </Select>
+                </Form.Item>
+                <Form.Item>
+                    <Space>
+                        <Button type="primary" htmlType="submit">
+                            Create
+                        </Button>
+                        <Button htmlType="button" onClick={handleCancel}>
+                            Cancel
+                        </Button>
+                    </Space>
+                </Form.Item>
+            </FormWrapper>
+        )
+    }
+
+    return (
+        <>
+            <ContentLayouWrapper>
+                <HomeWrapper>
+                    <div className={'headerWrapper'}>
+                        <h1>Projects</h1>
+                        <Button onClick={showModal} type={"primary"}>Create project</Button>
+                    </div>
+                    <div className={'searchsWrapper'}>
+                        <Input placeholder="Search projects" suffix={<MdOutlineSearch fontSize={20} color={'#637381'} />}/>
+                        <Select
+                            mode="multiple"
+                            suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}
+                            placeholder="select one country"
+                            defaultValue={['china']}
+                            // onChange={handleChange}
+                            options={options}
+                            optionRender={(option) => (
+                                <Space>
                                 <span role="img" aria-label={option.data.label}>
                                   {option.data.emoji}
                                 </span>
-                                {option.data.desc}
-                            </Space>
-                        )}
+                                    {option.data.desc}
+                                </Space>
+                            )}
+                        />
+                    </div>
+                    <Table
+                        size={"small"}
+                        columns={columns}
+                        dataSource={data}
+                        showSorterTooltip={{
+                            target: 'sorter-icon',
+                        }}
                     />
-                </div>
-                <Table
-                    size={"small"}
-                    columns={columns}
-                    dataSource={data}
-                    showSorterTooltip={{
-                        target: 'sorter-icon',
-                    }}
-                />
-            </HomeWrapper>
-        </ContentLayouWrapper>
+                </HomeWrapper>
+            </ContentLayouWrapper>
+            <Modal
+                title="Create project"
+                wrapClassName={'modalAddProject'}
+                open={isModalOpen}
+                onCancel={handleCancel}
+                footer={false}
+                getContainer={triggerNode => triggerNode}
+            >
+                {renderContentModal()}
+            </Modal>
+        </>
     );
 }
 

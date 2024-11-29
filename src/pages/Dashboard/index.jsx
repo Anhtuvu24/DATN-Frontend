@@ -1,16 +1,25 @@
 import React, { lazy, Suspense } from 'react'
+import { Splitter } from "antd";
 
 // Components
-import Loader from '../../components/loader';
 import DashboardRoutes from "./DashboardRoutes.jsx";
+import Sidebar from "../../components/Sidebar/index.jsx";
 
 function Dashboard() {
 
     return (
-        <div>
-            <div className={'sidebar'}></div>
-            <DashboardRoutes />
-        </div>
+        <Splitter
+            style={{
+                height: 'calc(100% - 56px)',
+            }}
+        >
+            <Splitter.Panel defaultSize="40%" min="10%" max="70%">
+                <Sidebar />
+            </Splitter.Panel>
+            <Splitter.Panel>
+                <DashboardRoutes />
+            </Splitter.Panel>
+        </Splitter>
     );
 };
 
