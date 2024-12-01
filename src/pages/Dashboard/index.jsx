@@ -13,7 +13,7 @@ function Dashboard() {
                 height: 'calc(100% - 56px)',
             }}
         >
-            <Splitter.Panel defaultSize="40%" min="10%" max="70%">
+            <Splitter.Panel defaultSize={400} min="10%" max="70%">
                 <Sidebar />
             </Splitter.Panel>
             <Splitter.Panel>

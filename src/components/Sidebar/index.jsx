@@ -1,42 +1,28 @@
 import React, { useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Space, Menu } from 'antd';
-import {
-    AppstoreOutlined,
-    ContainerOutlined,
-    DesktopOutlined,
-    MailOutlined,
-    PieChartOutlined,
-} from '@ant-design/icons';
+import { MdGroups } from "react-icons/md";
+import { HiViewBoards } from "react-icons/hi";
+import { IoMdSettings } from "react-icons/io";
 
 // Styles
 import { SidebarWrapper } from './local.styles';
 
 const items = [
     {
-        key: '1',
-        icon: <PieChartOutlined />,
-        label: 'Option 1',
+        key: 'board',
+        icon: <HiViewBoards />,
+        label: 'Board',
     },
     {
-        key: '2',
-        icon: <DesktopOutlined />,
-        label: 'Option 2',
+        key: 'admin_tool',
+        icon: <MdGroups />,
+        label: 'Admin tool',
     },
     {
-        key: '3',
-        icon: <ContainerOutlined />,
-        label: 'Option 3',
-    },
-    {
-        key: 'sub1',
-        label: 'Navigation One',
-        icon: <MailOutlined />,
-    },
-    {
-        key: 'sub2',
-        label: 'Navigation Two',
-        icon: <AppstoreOutlined />,
+        key: 'setting',
+        icon: <IoMdSettings />,
+        label: 'Setting',
     },
 ];
 
@@ -56,8 +42,7 @@ function Sidebar() {
             </div>
             <div className={'menuWrapper'}>
                 <Menu
-                    defaultSelectedKeys={['1']}
-                    defaultOpenKeys={['sub1']}
+                    defaultSelectedKeys={['board']}
                     mode="inline"
                     inlineCollapsed={collapsed}
                     items={items}

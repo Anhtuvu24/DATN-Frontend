@@ -21,6 +21,11 @@ const GlobalStyle = createGlobalStyle`
       font-weight: 500;
     }
   }
+  
+  // Modal antd
+  .ant-modal-content {
+    padding-bottom: 0.5px !important;
+  }
 `
 
 export default GlobalStyle;
