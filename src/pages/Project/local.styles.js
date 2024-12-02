@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Form } from 'antd';
+import { Form, Upload } from 'antd';
 
 export const ProjectDetailWrapper = styled.div`
   height: 100%;
@@ -55,6 +55,9 @@ export const ProjectDetailWrapper = styled.div`
       display: flex;
       gap: 12px;
       margin-top: 24px;
+      > div {
+        height: 100%;
+      }
     }
   }
 `
@@ -87,4 +90,60 @@ export const FormEditSprint = styled(Form) `
     max-width: 248px;
     width: 100%;
   }
+  .uploadWrapper {
+    .ant-upload {
+      width: 100%;
+      height: 100%;
+    }
+  }
+`
+
+export const FormCreateTask = styled(Form) `
+  .note {
+    color: var(--text-disabled);
+    span {
+      color: red;
+    }
+  }
+  .ant-picker {
+    width: 100%;
+  }
+  .uploadWrapper {
+    .ant-upload {
+      width: 100%;
+      height: 150px;
+    }
+  }
+`
+
+export const UploadAreaWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  border: 1px dashed #000;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 500;
+  color: var(--second-text-color);
+`
+
+export const ListFileWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  border: 1px dashed #000;
+  border-radius: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 8px;
+  gap: 8px;
+  font-weight: 500;
+  color: var(--second-text-color);
+  overflow-y: auto;
+`
+
+export const SelectOptionItem = styled.div`
+  display: flex;
+  align-items: center;
 `

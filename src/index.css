@@ -37,4 +37,13 @@
   --text-warning-inverse: #172B4D;
   --text-success: #216E4E;
   --text-disabled: #091E424F;
+
+  /*border*/
+  --border-color: #d9d9d9;
+}
+
+div[style*="placeholder"] {
+  visibility: hidden;
+  height: 100%;
+  width: 100%;
 }

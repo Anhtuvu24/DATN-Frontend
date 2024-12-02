@@ -13,7 +13,7 @@ function Dashboard() {
                 height: 'calc(100% - 56px)',
             }}
         >
-            <Splitter.Panel defaultSize={400} min="10%" max="70%">
+            <Splitter.Panel collapsible={true} defaultSize={300} min={300} max={400}>
                 <Sidebar />
             </Splitter.Panel>
             <Splitter.Panel>

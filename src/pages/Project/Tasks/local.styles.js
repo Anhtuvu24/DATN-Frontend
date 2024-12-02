@@ -10,12 +10,13 @@ export const TasksWrapper = styled.div`
   border-radius: 8px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  flex: 1;
+  height: 100%;
   > div {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    margin-bottom: 16px;
+    transition: none;
   }
   button {
     display: flex;

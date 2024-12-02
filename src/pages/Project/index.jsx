@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
-import {Avatar, Breadcrumb, Button, Input, Dropdown, Modal, Form, Space, DatePicker} from "antd";
+import { Avatar, Breadcrumb, Button, Input, Dropdown, Modal, Form, Space, DatePicker, Select, Upload } from "antd";
 import { SlOptions } from "react-icons/sl";
-import { MdOutlineSearch } from "react-icons/md";
+import { MdOutlineSearch, MdUpload } from "react-icons/md";
 import { DragDropContext } from 'react-beautiful-dnd';
+import moment from "moment";
 
 // Styles
-import {FormEditSprint, ProjectDetailWrapper, UserItem} from './local.styles.js';
+import {
+    FormCreateTask,
+    FormEditSprint, ListFileWrapper,
+    ProjectDetailWrapper,
+    SelectOptionItem,
+    UploadAreaWrapper,
+    UserItem
+} from './local.styles.js';
 import StatusesTask from "./StatusesTask";
 import Tasks from "./Tasks";
+import FileComp from "../../components/FileComp";
 
 const users = ['V', 'A', 'T'];
 
@@ -93,11 +102,32 @@ const initData = [
     }
 ]
 
+const { Option } = Select;
+
+const normFile = (e) => {
+    if (Array.isArray(e)) {
+        return e;
+    }
+    return e?.fileList;
+};
+
+const disabledDate = (current) => {
+    // Không cho phép chọn ngày trước ngày hôm nay
+    return current && current < moment().startOf("day");
+};
+
 function Project() {
     const [isModalSprintOpen, setIsModalSprintOpen] = useState(false);
+    const [isModalCreateTaskOpen, setIsModalCreateTaskOpen] = useState(false);
+    const [record, setRecord] = useState(null);
     const [usersSelect, setUsersSelect] = useState([]);
     const [categories, setCategories] = useState(initData)
+    const [fileList, setFileList] = useState([]);
     const [form] = Form.useForm();
+
+    const handleChangeUpload = ({ fileList: newFileList }) => {
+        setFileList(newFileList);
+    };
 
     const onSelect = (item) => {
         if (usersSelect.includes(item)) {
@@ -115,7 +145,14 @@ function Project() {
     }
 
     const handleCancel = () => {
-        setIsModalSprintOpen(false)
+        if (isModalSprintOpen) {
+            setIsModalSprintOpen(false);
+        }
+        if (isModalCreateTaskOpen) {
+            setIsModalCreateTaskOpen(false);
+            setFileList([])
+        }
+        form.resetFields();
     }
 
     const renderContentModalSprint = () => {
@@ -179,9 +216,180 @@ function Project() {
         )
     }
 
-    const onDragEnd = (result) => {
-        debugger
+    const renderContentModalCreateTask = () => {
+        return (
+            <FormCreateTask
+                form={form}
+                labelAlign={'left'}
+                labelCol={{
+                    flex: '110px'
+                }}
+            >
+                <Form.Item>
+                    <p className={'note'}>Required fields are marked with an asterisk <span>*</span></p>
+                </Form.Item>
+                <Form.Item
+                    label={'Task name'}
+                    name='name'
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <Input placeholder={'Task name'} />
+                </Form.Item>
+                <Form.Item
+                    label={'Description'}
+                    name='description'
+                >
+                    <Input.TextArea placeholder={'Task name'} />
+                </Form.Item>
+                <Form.Item
+                    label="Assignee"
+                    name="assignee"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Please input!',
+                        },
+                    ]}
+                >
+                    <Select style={{ height: 40 }} suffixIcon={false}>
+                        <Option value="apple">
+                            <SelectOptionItem>
+                                <img
+                                    src="https://via.placeholder.com/20"
+                                    alt="apple"
+                                    style={{ marginRight: 8 }}
+                                    width={30}
+                                />
+                                Apple
+                            </SelectOptionItem>
+                        </Option>
+                        <Option value="banana">
+                            <SelectOptionItem>
+                                <img
+                                    src="https://via.placeholder.com/20"
+                                    alt="banana"
+                                    style={{ marginRight: 8 }}
+                                    width={30}
+                                />
+                                Banana
+                            </SelectOptionItem>
+                        </Option>
+                        <Option value="cherry">
+                            <SelectOptionItem>
+                                <img
+                                    src="https://via.placeholder.com/20"
+                                    alt="cherry"
+                                    style={{ marginRight: 8 }}
+                                    width={30}
+                                />
+                                Cherry
+                            </SelectOptionItem>
+                        </Option>
+                    </Select>
+                </Form.Item>
+                <Form.Item
+                    required={true}
+                    name='Expried date'
+                    label="expriedDate"
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <DatePicker disabledDate={disabledDate} />
+                </Form.Item>
+                <Form.Item
+                    name="upload"
+                    valuePropName="fileList"
+                    getValueFromEvent={normFile}
+                >
+                    <Upload
+                        accept='.jpg,.png,.jpeg'
+                        multiple={true}
+                        name="attachment"
+                        listType="picture"
+                        className={'uploadWrapper'}
+                        beforeUpload={() => false}
+                        fileList={fileList}
+                        onChange={handleChangeUpload}
+                        showUploadList={false}
+                    >
+                        {fileList.length ? (
+                            <ListFileWrapper>
+                                {fileList.map((item, index) => {
+                                    return (
+                                        <FileComp file={item} size={'100px'} />
+                                    )
+                                })}
+                            </ListFileWrapper>
+                        ) : (
+                            <UploadAreaWrapper>
+                                <MdUpload fontSize={20} color={'#637381'} /> Attachments
+                            </UploadAreaWrapper>
+
+                        )}
+                    </Upload>
+                </Form.Item>
+                <Form.Item>
+                    <Space>
+                        <Button type="primary" htmlType="submit">
+                            Create
+                        </Button>
+                        <Button htmlType="button" onClick={handleCancel}>
+                            Cancel
+                        </Button>
+                    </Space>
+                </Form.Item>
+            </FormCreateTask>
+        )
     }
+
+    const onClickCreateTask = () => {
+        setIsModalCreateTaskOpen(true);
+    }
+
+    const onDragEnd = (result) => {
+        const { source, destination } = result;
+
+        if (!destination) return;
+
+        if (source.droppableId === destination.droppableId && source.index === destination.index) {
+            return;
+        }
+
+        const sourceCategory = categories.find(cat => cat.id === source.droppableId);
+        const destCategory = categories.find(cat => cat.id === destination.droppableId);
+
+        if (sourceCategory && destCategory) {
+            const sourceTasks = Array.from(sourceCategory.tasks);
+            const destTasks = Array.from(destCategory.tasks);
+
+            const [movedTask] = sourceTasks.splice(source.index, 1);
+
+            if (source.droppableId === destination.droppableId) {
+                sourceTasks.splice(destination.index, 0, movedTask);
+                setCategories(categories.map(cat =>
+                    cat.id === sourceCategory.id
+                        ? { ...cat, tasks: sourceTasks }
+                        : cat
+                ));
+            } else {
+                destTasks.splice(destination.index, 0, movedTask);
+                setCategories(categories.map(cat =>
+                    cat.id === sourceCategory.id
+                        ? { ...cat, tasks: sourceTasks }
+                        : cat.id === destCategory.id
+                            ? { ...cat, tasks: destTasks }
+                            : cat
+                ));
+            }
+        }
+    };
 
     return (
         <>
@@ -212,9 +420,9 @@ function Project() {
                 <div className={'searchAndFilterNav'}>
                     <Input placeholder="Search" prefix={<MdOutlineSearch fontSize={20} color={'#637381'} />}/>
                     <div className={'listUser'}>
-                        {users.map(item => {
+                        {users.map((item, index) => {
                             return (
-                                <UserItem is_select={usersSelect.includes(item) || undefined} onClick={() => onSelect(item)} className={'userItem'}>
+                                <UserItem key={`user-${index}`} is_select={usersSelect.includes(item) || undefined} onClick={() => onSelect(item)} className={'userItem'}>
                                     <Avatar size={32}>{item}</Avatar>
                                 </UserItem>
                             )
@@ -226,7 +434,13 @@ function Project() {
                     <DragDropContext onDragEnd={onDragEnd}>
                         <div className={'tasksWrapper'}>
                             {categories.map((item, index) => {
-                                return <Tasks tasks={item.tasks} id={item.id} key={item.id} />
+                                return <Tasks
+                                    tasks={item.tasks}
+                                    id={item.id}
+                                    key={item.id}
+                                    setRecord={setRecord}
+                                    onClickCreateTask={onClickCreateTask}
+                                />
                             })}
                         </div>
                     </DragDropContext>
@@ -241,6 +455,16 @@ function Project() {
                 getContainer={triggerNode => triggerNode}
             >
                 {renderContentModalSprint()}
+            </Modal>
+            <Modal
+                title="Create task"
+                wrapClassName={'modalAddTaskmy'}
+                open={isModalCreateTaskOpen}
+                onCancel={handleCancel}
+                footer={false}
+                getContainer={triggerNode => triggerNode}
+            >
+                {renderContentModalCreateTask()}
             </Modal>
         </>
     );
