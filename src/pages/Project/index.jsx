@@ -5,6 +5,9 @@ import { MdOutlineSearch, MdUpload } from "react-icons/md";
 import { DragDropContext } from 'react-beautiful-dnd';
 import moment from "moment";
 
+// Components
+import CKEditorCustom from "../../components/CKEditor/index.jsx";
+
 // Styles
 import {
     FormCreateTask,
@@ -243,7 +246,7 @@ function Project() {
                     label={'Description'}
                     name='description'
                 >
-                    <Input.TextArea placeholder={'Task name'} />
+                    <CKEditorCustom />
                 </Form.Item>
                 <Form.Item
                     label="Assignee"
@@ -255,14 +258,14 @@ function Project() {
                         },
                     ]}
                 >
-                    <Select style={{ height: 40 }} suffixIcon={false}>
+                    <Select style={{ height: 40 }} suffixIcon={false} showSearch={true}>
                         <Option value="apple">
                             <SelectOptionItem>
                                 <img
-                                    src="https://via.placeholder.com/20"
+                                    src="https://firebasestorage.googleapis.com/v0/b/datn-1af41.firebasestorage.app/o/avatars%2F1732561620989-default-user.png?alt=media&token=eef741cb-385c-4d42-91cc-1d5eecf9ab74"
                                     alt="apple"
                                     style={{ marginRight: 8 }}
-                                    width={30}
+                                    width={24}
                                 />
                                 Apple
                             </SelectOptionItem>
@@ -273,7 +276,7 @@ function Project() {
                                     src="https://via.placeholder.com/20"
                                     alt="banana"
                                     style={{ marginRight: 8 }}
-                                    width={30}
+                                    width={24}
                                 />
                                 Banana
                             </SelectOptionItem>
@@ -284,7 +287,7 @@ function Project() {
                                     src="https://via.placeholder.com/20"
                                     alt="cherry"
                                     style={{ marginRight: 8 }}
-                                    width={30}
+                                    width={24}
                                 />
                                 Cherry
                             </SelectOptionItem>

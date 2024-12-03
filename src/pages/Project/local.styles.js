@@ -146,4 +146,7 @@ export const ListFileWrapper = styled.div`
 export const SelectOptionItem = styled.div`
   display: flex;
   align-items: center;
+  img {
+    border-radius: 50%;
+  }
 `
