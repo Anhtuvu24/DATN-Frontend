@@ -50,11 +50,10 @@ export const ProjectDetailWrapper = styled.div`
     flex-direction: column;
     flex: 1;
     padding-bottom: 24px;
-    .tasksWrapper {
+    .tasksContainer {
       flex: 1;
       display: flex;
       gap: 12px;
-      margin-top: 24px;
       > div {
         height: 100%;
       }

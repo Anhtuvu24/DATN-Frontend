@@ -6,8 +6,9 @@ export const TasksWrapper = styled.div`
   box-shadow: 0px 0px 2px 0px #919EAB33;
   max-width: 282px;
   min-width: 282px;
-  padding: 16px 8px;
-  border-radius: 8px;
+  padding: 0 8px 16px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -16,7 +17,7 @@ export const TasksWrapper = styled.div`
     flex-direction: column;
     gap: 16px;
     margin-bottom: 16px;
-    transition: none;
+    //transition: none;
   }
   button {
     display: flex;

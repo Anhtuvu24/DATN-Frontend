@@ -3,9 +3,9 @@ import React from 'react';
 // Styles
 import { StatusItemWrapper } from './local.styles.js';
 
-function StatusItem({ status }) {
+function StatusItem({ status, isScrolled }) {
     return (
-        <StatusItemWrapper>
+        <StatusItemWrapper isScrolled={isScrolled}>
             <p>{status.title}</p>
         </StatusItemWrapper>
     )

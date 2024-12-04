@@ -10,6 +10,11 @@ const privateRoutes = [
         component: lazy(() => import('../Project')),
         exact: true,
     },
+    {
+        path: 'task/:id',
+        component: lazy(() => import('../TaskDetail')),
+        exact: true,
+    },
 ]
 
 function DashboardRoutes() {

@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import { StatusesWrapper } from './local.styles.js';
 import StatusItem from "../StatusItem/index.jsx";
 
-function StatusesTask({ categories }) {
+function StatusesTask({ categories, isScrolled }) {
     return (
         <StatusesWrapper>
             {categories.map((item, index) => {
                 return (
-                    <StatusItem status={item} key={index} />
+                    <StatusItem isScrolled={isScrolled} status={item} key={index} />
                 )
             })}
         </StatusesWrapper>

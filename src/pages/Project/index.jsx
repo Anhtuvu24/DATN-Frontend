@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Avatar, Breadcrumb, Button, Input, Dropdown, Modal, Form, Space, DatePicker, Select, Upload } from "antd";
 import { SlOptions } from "react-icons/sl";
 import { MdOutlineSearch, MdUpload } from "react-icons/md";
@@ -105,6 +105,21 @@ const initData = [
     }
 ]
 
+const priorityOption = [
+    {
+        value: 'low',
+        label: <span>Low</span>
+    },
+    {
+        value: 'medium',
+        label: <span>Medium</span>
+    },
+    {
+        value: 'High',
+        label: <span>High</span>
+    },
+]
+
 const { Option } = Select;
 
 const normFile = (e) => {
@@ -127,6 +142,20 @@ function Project() {
     const [categories, setCategories] = useState(initData)
     const [fileList, setFileList] = useState([]);
     const [form] = Form.useForm();
+
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const tasksContainer = document.querySelector('.TasksWrapper');
+        const handleScroll = () => {
+            setIsScrolled(tasksContainer.scrollTop > 0);
+        };
+
+        tasksContainer.addEventListener('scroll', handleScroll);
+        return () => {
+            tasksContainer.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     const handleChangeUpload = ({ fileList: newFileList }) => {
         setFileList(newFileList);
@@ -246,7 +275,8 @@ function Project() {
                     label={'Description'}
                     name='description'
                 >
-                    <CKEditorCustom />
+                    {/*<CKEditorCustom />*/}
+                    <Input.TextArea placeholder={'Task name'} />
                 </Form.Item>
                 <Form.Item
                     label="Assignee"
@@ -305,6 +335,12 @@ function Project() {
                     ]}
                 >
                     <DatePicker disabledDate={disabledDate} />
+                </Form.Item>
+                <Form.Item
+                    name='priority'
+                    label="Priority"
+                >
+                    <Select defaultValue={'medium'} options={priorityOption} />
                 </Form.Item>
                 <Form.Item
                     name="upload"
@@ -433,9 +469,9 @@ function Project() {
                     </div>
                 </div>
                 <div className={'TasksWrapper'}>
-                    <StatusesTask categories={categories} />
+                    <StatusesTask isScrolled={isScrolled} categories={categories} />
                     <DragDropContext onDragEnd={onDragEnd}>
-                        <div className={'tasksWrapper'}>
+                        <div className={'tasksContainer'}>
                             {categories.map((item, index) => {
                                 return <Tasks
                                     tasks={item.tasks}
