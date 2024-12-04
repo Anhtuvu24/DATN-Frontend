@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
-import { Splitter, Breadcrumb, Button, Input } from 'antd';
+import {Splitter, Breadcrumb, Button, Input, Upload, Skeleton, Image} from 'antd';
+import { MdAdd } from "react-icons/md";
+import { IoMdTrash } from "react-icons/io";
 
 // Images
 import testImage from '../../assets/images/LoginBanner1.png';
@@ -10,13 +12,15 @@ import {
     FileDetailContainer,
     MainContentWrapper,
     DescriptionWrapper,
-    DescriptionContent, NameTask,
+    DescriptionContent, NameTask, AttachmentsTaskWrapper,
 } from "./local.styles.js";
 import CKEditorCustom from "../../components/CKEditor";
 
 const exampleHtml = '<h2>Congratulations on setting up CKEditor 5! 🎉</h2>\n<p>\n\tYou\'ve successfully created a CKEditor 5 project. This powerful text editor\n\twill enhance your application, enabling rich text editing capabilities that\n\tare customizable and easy to use.\n</p>';
 
 function FileDetail() {
+    const [fileList, setFileList] = useState([]);
+    const [isUploading, setIsUploading] = useState(false);
     const [isEditDescription, setIsEditDescription] = useState(false);
     const [nameTask, setNameTask] = useState('Lỗi tự động quay lại tổ chức mặc định khi đăng nhập trên Docbase');
 
@@ -44,6 +48,19 @@ function FileDetail() {
         console.log(e.target.value)
     }
 
+    const onSaveDescription = () => {
+        setIsEditDescription(false);
+    };
+
+    const onCancelDescription = () => {
+        setIsEditDescription(false);
+    };
+
+    const onChangeUpload = ({file, fileList: _fileList}) => {
+        setFileList(prev => [...prev, file]);
+        setIsUploading(true);
+    }
+
     return (
         <FileDetailContainer>
             <Splitter
@@ -67,19 +84,45 @@ function FileDetail() {
                                 <EditDescriptionWrapper>
                                     <CKEditorCustom content={exampleHtml} />
                                     <div className={'btnsEditWrapper'}>
-                                        <Button type={"primary"}>Save</Button>
-                                        <Button>Cancel</Button>
+                                        <Button type={"primary"} onClick={onSaveDescription}>Save</Button>
+                                        <Button type={"text"} onClick={onCancelDescription}>Cancel</Button>
                                     </div>
                                 </EditDescriptionWrapper>
                             ) : (
                                 <DescriptionContent onDoubleClick={onDoubleClickDescription} dangerouslySetInnerHTML={{ __html: exampleHtml }} />
                             )}
                         </DescriptionWrapper>
-                        <div className={'attachmentsTaskWrapper'}>
-                            <img width={137} height={140} src={testImage} alt={'Attachment image'} />
-                            <img width={137} height={140} src={testImage} alt={'Attachment image'} />
-                            <img width={137} height={140} src={testImage} alt={'Attachment image'} />
-                        </div>
+                        <AttachmentsTaskWrapper>
+                            <h2>Attachments</h2>
+                            <div className={'attachmentList'}>
+                                <div className={'attachment'}>
+                                    <Image src={testImage} alt={'Attachment image'} />
+                                    <div className={'removeBtn'}><IoMdTrash fontSize={18} color={'#f3545d'} /></div>
+                                </div>
+                                <div className={'attachment'}>
+                                    <Image src={testImage} alt={'Attachment image'} />
+                                    <div className={'removeBtn'}><IoMdTrash fontSize={18} color={'#f3545d'} /></div>
+                                </div>
+                                <div className={'attachment'}>
+                                    <Image src={testImage} alt={'Attachment image'} />
+                                    <div className={'removeBtn'}><IoMdTrash fontSize={18} color={'#f3545d'} /></div>
+                                </div>
+                                {fileList.map((item, index) => {
+                                    return <Skeleton.Button style={{ width: 140, height: 140 }} active={true} />
+                                })}
+                                <Upload
+                                    accept='.jpg,.png,.jpeg'
+                                    onChange={onChangeUpload}
+                                    beforeUpload={() => false}
+                                    showUploadList={false}
+                                    multiple={true}
+                                >
+                                    <div className={'attachmentAdd'}>
+                                        <MdAdd fontSize={30} color={'#637381'} />
+                                    </div>
+                                </Upload>
+                            </div>
+                        </AttachmentsTaskWrapper>
                     </MainContentWrapper>
                 </Splitter.Panel>
                 <Splitter.Panel>

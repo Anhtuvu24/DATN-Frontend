@@ -70,6 +70,7 @@ import {
 import 'ckeditor5/ckeditor5.css';
 
 import './local.css';
+import {Skeleton} from "antd";
 
 /**
  * Create a free account with a trial: https://portal.ckeditor.com/checkout?plan=free
@@ -82,7 +83,7 @@ export default function CKEditorCustom({ content }) {
     const editorContainerRef = useRef(null);
     const editorRef = useRef(null);
     const [isLayoutReady, setIsLayoutReady] = useState(false);
-
+    console.log(isLayoutReady)
     useEffect(() => {
         setIsLayoutReady(true);
 
@@ -369,7 +370,11 @@ export default function CKEditorCustom({ content }) {
         <div className="main-container">
             <div className="editor-container editor-container_classic-editor editor-container_include-style" ref={editorContainerRef}>
                 <div className="editor-container__editor">
-                    <div ref={editorRef}>{editorConfig && <CKEditor editor={ClassicEditor} config={editorConfig} />}</div>
+                    {isLayoutReady ? (
+                        <div ref={editorRef}>{editorConfig && <CKEditor editor={ClassicEditor} config={editorConfig} />}</div>
+                    ) : (
+                        <Skeleton style={{ width: '100%', height: '150px', paddingLeft: '8px', marginTop: '8px' }} />
+                    )}
                 </div>
             </div>
         </div>

@@ -41,6 +41,7 @@ export const EditDescriptionWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-top: 8px;
   .main-container {
     margin: unset;
     width: 100%;
@@ -51,6 +52,106 @@ export const EditDescriptionWrapper = styled.div`
         .ck-editor__editable_inline {
           padding: 0 24px;
         }
+      }
+    }
+  }
+  .btnsEditWrapper {
+    display: flex;
+    gap: 8px;
+  }
+`
+
+export const AttachmentsTaskWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+
+  > h2 {
+    font-size: 16px;
+    color: var(--second-text-color);
+    font-weight: 600;
+    padding-left: 8px;
+  }
+
+  .attachmentList {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 8px;
+
+    .attachment {
+      display: flex;
+      position: relative;
+      align-items: center;
+      box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+      width: 140px;
+      height: 140px;
+      border-radius: 8px;
+      overflow: hidden;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.5);
+
+        .removeBtn {
+          display: flex;
+        }
+      }
+
+      .ant-image {
+        height: 100%;
+        display: flex;
+        align-items: center;
+
+        img {
+          max-width: 100%;
+        }
+      }
+
+      .removeBtn {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        padding: 1px;
+        z-index: 100000;
+        background-color: white;
+        border-radius: 4px;
+
+        svg {
+          transition: all 0.2s ease;
+        }
+
+        &:hover {
+          cursor: pointer;
+          background-color: #e1e0e0;
+          svg {
+            fill: var(--main-color);
+          }
+        }
+
+        //display: none;
+      }
+    }
+
+    .attachmentAdd {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 140px;
+      height: 140px;
+      border: 1px dashed #637381;
+      border-radius: 8px;
+      box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+
+      &:hover {
+        background-color: var(--hover-color);
+        cursor: pointer;
       }
     }
   }
