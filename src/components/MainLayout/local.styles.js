@@ -6,7 +6,7 @@ export const MainLayoutWrapper = styled.div`
   width: 100%;
 `
 
-export const ContentLayouWrapper = styled.div`
+export const ContentLayoutWrapper = styled.div`
   background-color: var(--main-background-color);
   height: calc(100% - 56px);
   width: 100%;

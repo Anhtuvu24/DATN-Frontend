@@ -10,6 +10,7 @@ import CKEditorCustom from "../../components/CKEditor/index.jsx";
 
 // Styles
 import {
+    EmptySprintWrapper,
     FormCreateTask,
     FormEditSprint, ListFileWrapper,
     ProjectDetailWrapper,
@@ -20,6 +21,7 @@ import {
 import StatusesTask from "./StatusesTask";
 import Tasks from "./Tasks";
 import FileComp from "../../components/FileComp";
+import {useHistory} from "react-router-dom";
 
 const users = ['V', 'A', 'T'];
 
@@ -27,6 +29,17 @@ const items = [
     {
         key: 'edit_sprint',
         label: <p>Edit sprint</p>,
+    },
+];
+
+const itemsBreadcrumb = [
+    {
+        title: 'Projects',
+        path: '/home'
+    },
+    {
+        title: 'Software Development',
+        path: '/project/1'
     },
 ];
 
@@ -135,7 +148,9 @@ const disabledDate = (current) => {
 };
 
 function Project() {
+    const history = useHistory();
     const [isModalSprintOpen, setIsModalSprintOpen] = useState(false);
+    const [isModalCreateSprintOpen, setIsModalCreateSprintOpen] = useState(false);
     const [isModalCreateTaskOpen, setIsModalCreateTaskOpen] = useState(false);
     const [record, setRecord] = useState(null);
     const [usersSelect, setUsersSelect] = useState([]);
@@ -147,14 +162,16 @@ function Project() {
 
     useEffect(() => {
         const tasksContainer = document.querySelector('.TasksWrapper');
-        const handleScroll = () => {
-            setIsScrolled(tasksContainer.scrollTop > 0);
-        };
+        if (tasksContainer) {
+            const handleScroll = () => {
+                setIsScrolled(tasksContainer.scrollTop > 0);
+            };
 
-        tasksContainer.addEventListener('scroll', handleScroll);
-        return () => {
-            tasksContainer.removeEventListener('scroll', handleScroll);
-        };
+            tasksContainer.addEventListener('scroll', handleScroll);
+            return () => {
+                tasksContainer.removeEventListener('scroll', handleScroll);
+            };
+        }
     }, []);
 
     const handleChangeUpload = ({ fileList: newFileList }) => {
@@ -180,6 +197,9 @@ function Project() {
         if (isModalSprintOpen) {
             setIsModalSprintOpen(false);
         }
+        if (isModalCreateSprintOpen) {
+            setIsModalCreateSprintOpen(false);
+        }
         if (isModalCreateTaskOpen) {
             setIsModalCreateTaskOpen(false);
             setFileList([])
@@ -199,17 +219,19 @@ function Project() {
                 <Form.Item>
                     <p className={'note'}>Required fields are marked with an asterisk <span>*</span></p>
                 </Form.Item>
-                <Form.Item
-                    label={'Sprint name'}
-                    name='sprintName'
-                    rules={[
-                        {
-                            required: true,
-                        },
-                    ]}
-                >
-                    <Input placeholder={'Sprint name'} />
-                </Form.Item>
+                {isModalSprintOpen && (
+                    <Form.Item
+                        label={'Sprint name'}
+                        name='sprintName'
+                        rules={[
+                            {
+                                required: true,
+                            },
+                        ]}
+                    >
+                        <Input placeholder={'Sprint name'} />
+                    </Form.Item>
+                )}
                 <Form.Item
                     required={true}
                     name='startDate'
@@ -392,6 +414,10 @@ function Project() {
         setIsModalCreateTaskOpen(true);
     }
 
+    const onClickCreateSprint = () => {
+        setIsModalCreateSprintOpen(true);
+    }
+
     const onDragEnd = (result) => {
         const { source, destination } = result;
 
@@ -430,65 +456,84 @@ function Project() {
         }
     };
 
+    const onClickBreadcrumb = (path) => {
+        history.push(path);
+    }
+
     return (
         <>
             <ProjectDetailWrapper>
                 <Breadcrumb>
-                    <Breadcrumb.Item>Projects</Breadcrumb.Item>
-                    <Breadcrumb.Item>Softwate Development</Breadcrumb.Item>
+                    {itemsBreadcrumb.map(item => {
+                        return (
+                            <Breadcrumb.Item onClick={() => onClickBreadcrumb(item.path)}>{item.title}</Breadcrumb.Item>
+                        )
+                    })}
                 </Breadcrumb>
-                <div className={'sprintHeader'}>
-                    <h1>SD Sprint 10</h1>
-                    <div className={'sprintOption'}>
-                        <p>Kết thúc vào 22/12/2024</p>
-                        <Button type={"primary"}>Complete sprint</Button>
-                        <Dropdown
-                            menu={{
-                                items,
-                                onClick: onClickSettingSprint
-                            }}
-                            arrow={false}
-                            placement="bottomLeft"
-                            trigger={'click'}
-                            getPopupContainer={triggerNode => triggerNode}
-                        >
-                            <Button><SlOptions color={'#637381'} fontSize={20} /></Button>
-                        </Dropdown>
-                    </div>
-                </div>
-                <div className={'searchAndFilterNav'}>
-                    <Input placeholder="Search" prefix={<MdOutlineSearch fontSize={20} color={'#637381'} />}/>
-                    <div className={'listUser'}>
-                        {users.map((item, index) => {
-                            return (
-                                <UserItem key={`user-${index}`} is_select={usersSelect.includes(item) || undefined} onClick={() => onSelect(item)} className={'userItem'}>
-                                    <Avatar size={32}>{item}</Avatar>
-                                </UserItem>
-                            )
-                        })}
-                    </div>
-                </div>
-                <div className={'TasksWrapper'}>
-                    <StatusesTask isScrolled={isScrolled} categories={categories} />
-                    <DragDropContext onDragEnd={onDragEnd}>
-                        <div className={'tasksContainer'}>
-                            {categories.map((item, index) => {
-                                return <Tasks
-                                    tasks={item.tasks}
-                                    id={item.id}
-                                    key={item.id}
-                                    setRecord={setRecord}
-                                    onClickCreateTask={onClickCreateTask}
-                                />
-                            })}
+                {true ? (
+                    <EmptySprintWrapper>
+                        <h1>Empty sprint</h1>
+                        <p>Create a sprint to start work</p>
+                        <Button type={"primary"} onClick={onClickCreateSprint}>Create sprint</Button>
+                    </EmptySprintWrapper>
+                ) : (
+                    <>
+                        <div className={'sprintHeader'}>
+                            <h1>SD Sprint 10</h1>
+                            <div className={'sprintOption'}>
+                                <p>Kết thúc vào 22/12/2024</p>
+                                <Button type={"primary"}>Complete sprint</Button>
+                                <Dropdown
+                                    menu={{
+                                        items,
+                                        onClick: onClickSettingSprint
+                                    }}
+                                    arrow={false}
+                                    placement="bottomLeft"
+                                    trigger={'click'}
+                                    getPopupContainer={triggerNode => triggerNode}
+                                >
+                                    <Button><SlOptions color={'#637381'} fontSize={20} /></Button>
+                                </Dropdown>
+                            </div>
                         </div>
-                    </DragDropContext>
-                </div>
+                        <div className={'searchAndFilterNav'}>
+                            <Input placeholder="Search" prefix={<MdOutlineSearch fontSize={20} color={'#637381'} />}/>
+                            <div className={'listUser'}>
+                                {users.map((item, index) => {
+                                    return (
+                                        <UserItem key={`user-${index}`} is_select={usersSelect.includes(item) || undefined} onClick={() => onSelect(item)} className={'userItem'}>
+                                            <Avatar size={32}>{item}</Avatar>
+                                        </UserItem>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                        <div className={'TasksWrapper'}>
+                            <StatusesTask isScrolled={isScrolled} categories={categories} />
+                            <DragDropContext onDragEnd={onDragEnd}>
+                                <div className={'tasksContainer'}>
+                                    {categories.map((item, index) => {
+                                        return <Tasks
+                                            tasks={item.tasks}
+                                            id={item.id}
+                                            key={item.id}
+                                            setRecord={setRecord}
+                                            onClickCreateTask={onClickCreateTask}
+                                        />
+                                    })}
+                                </div>
+                            </DragDropContext>
+                        </div>
+                    </>
+                )}
+
+
             </ProjectDetailWrapper>
             <Modal
-                title="Create project"
+                title={isModalCreateSprintOpen ? "Create sprint" : "Edit sprint"}
                 wrapClassName={'modalAddProject'}
-                open={isModalSprintOpen}
+                open={isModalSprintOpen || isModalCreateSprintOpen}
                 onCancel={handleCancel}
                 footer={false}
                 getContainer={triggerNode => triggerNode}

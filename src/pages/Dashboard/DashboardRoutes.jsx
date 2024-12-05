@@ -15,6 +15,11 @@ const privateRoutes = [
         component: lazy(() => import('../TaskDetail')),
         exact: true,
     },
+    {
+        path: 'account',
+        component: lazy(() => import('../AccountManager')),
+        exact: true,
+    },
 ]
 
 function DashboardRoutes() {

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Form } from "antd";
 
-export const HomeWrapper = styled.div`
+export const AccountsManagerWrapper = styled.div`
   padding: 22px 40px 0;
   display: flex;
   flex-direction: column;

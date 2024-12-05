@@ -26,6 +26,13 @@ const GlobalStyle = createGlobalStyle`
   .ant-modal-content {
     padding-bottom: 0.5px !important;
   }
+
+  .ant-breadcrumb-link {
+    &:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  }
 `
 
 export default GlobalStyle;

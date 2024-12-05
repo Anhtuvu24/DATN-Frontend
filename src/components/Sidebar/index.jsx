@@ -7,6 +7,7 @@ import { IoMdSettings } from "react-icons/io";
 
 // Styles
 import { SidebarWrapper } from './local.styles';
+import {useHistory} from "react-router-dom";
 
 const items = [
     {
@@ -27,10 +28,25 @@ const items = [
 ];
 
 function Sidebar() {
+    const history = useHistory();
     const [collapsed, setCollapsed] = useState(false);
     const toggleCollapsed = () => {
         setCollapsed(!collapsed);
     };
+
+    const onClick = ({item, key}) => {
+        switch (key) {
+            case 'admin_tool':
+                history.push('/account');
+                return;
+            case  'board':
+                history.push('/home')
+                return;
+            default:
+                return;
+        }
+    }
+
     return (
         <SidebarWrapper>
             <div className={'projectInforWrapper'}>
@@ -46,6 +62,7 @@ function Sidebar() {
                     mode="inline"
                     inlineCollapsed={collapsed}
                     items={items}
+                    onClick={onClick}
                 />
             </div>
         </SidebarWrapper>

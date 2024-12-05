@@ -157,6 +157,65 @@ export const AttachmentsTaskWrapper = styled.div`
   }
 `
 
-export const DetailsWrapper = styled.div`
-
+export const ActivityWrapper = styled.div`
+  > h2 {
+    color: #172B4D;
+    font-weight: 500;
+    font-size: 16px;
+  }
+  .typeShow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 8px;
+    .ant-radio-group {
+      display: flex;
+      gap: 8px;
+      .ant-radio-button-wrapper {
+        height: 24px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 4px;
+        border-radius: 4px;
+        border: 1px solid rgb(217, 217, 217);
+        &:before {
+          display: none;
+        }
+        span:last-child {
+          display: inline-flex;
+          align-items: center;
+          height: 24px;
+        }
+      }
+      .ant-radio-button-wrapper-checked {
+        border-color: var(--main-color);
+      }
+    }
+  }
+  .addCommentWrapper {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-top: 24px;
+    .blockAvatar {
+      display: flex;
+      height: 100% !important;
+    }
+    .ant-form {
+      flex: 1;
+      > div:first-child {
+        margin-bottom: 12px;
+      }
+    }
+  }
+  .listCommentWrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+  }
 `
+

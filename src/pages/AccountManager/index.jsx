@@ -1,47 +1,40 @@
 import React, { useState } from 'react';
-import {Button, Input, Select, Space, Table, Dropdown, Modal, Form, Upload, Menu, Popover} from "antd";
+import {
+    Button,
+    Input,
+    Select,
+    Space,
+    Table,
+    Dropdown,
+    Modal,
+    Form,
+    Upload,
+    Breadcrumb,
+    Switch,
+    Popover,
+    Menu
+} from "antd";
 import { PlusOutlined } from '@ant-design/icons';
 import { MdOutlineSearch, MdKeyboardArrowDown } from "react-icons/md";
 import { FaStar, FaRegStar  } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
 
 // Styles
-import { HomeWrapper, MoreOption, FormWrapper } from './local.styles';
-import { ContentLayoutWrapper } from "../../components/MainLayout/local.styles.js";
+import { AccountsManagerWrapper, MoreOption, FormWrapper } from './local.styles';
+import {ContentLayoutWrapper} from "../../components/MainLayout/local.styles.js";
 import {useHistory} from "react-router-dom";
 
 const options = [
     {
-        label: 'China',
-        value: 'china',
-        emoji: '🇨🇳',
-        desc: 'China (中国)',
+        label: 'Active',
+        value: 'active',
     },
     {
-        label: 'USA',
-        value: 'usa',
-        emoji: '🇺🇸',
-        desc: 'USA (美国)',
-    },
-    {
-        label: 'Japan',
-        value: 'japan',
-        emoji: '🇯🇵',
-        desc: 'Japan (日本)',
-    },
-    {
-        label: 'Korea',
-        value: 'korea',
-        emoji: '🇰🇷',
-        desc: 'Korea (韩国)',
+        label: 'Inactive',
+        value: 'inactive',
     },
 ];
-
 const items = [
-    {
-        key: 'project_setting',
-        label: <p>Project settings</p>,
-    },
     {
         key: 'move_to_trash',
         label: 'Move to trash',
@@ -50,26 +43,34 @@ const items = [
 
 const data = [
     {
-        is_favorite: true,
+        is_active: true,
         name: 'Business Analysis-1',
-        key: 'BA-1',
-        type: 'ATeam-managed software-1',
-        lead: 'Anh Tu-1',
+        gmail: 'BA-1@gmail.com',
+        role: 'Admin',
     },
 
     {
-        is_favorite: false,
+        is_active: false,
         name: 'Business Analysis',
-        key: 'BA',
-        type: 'Team-managed software',
-        lead: 'Anh Tu',
+        gmail: 'BA@gmail.com',
+        role: 'Employee',
     },
     {
-        is_favorite: true,
+        is_active: true,
         name: 'Business Analysis-2',
-        key: 'BA-2',
-        type: 'BTeam-managed software-1',
-        lead: 'Anh Tu-2',
+        gmail: 'BA-2@gmail.com',
+        role: 'Manager',
+    },
+];
+
+const itemsBreadcrumb = [
+    {
+        title: 'Projects',
+        path: '/home'
+    },
+    {
+        title: 'Accounts',
+        path: '/account'
     },
 ];
 
@@ -82,16 +83,15 @@ const normFile = (e) => {
     return e?.fileList;
 };
 
-function Home() {
+function AccountsManager() {
     const history = useHistory();
     const [open, setOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
-    const [fileList, setFileList] = useState([]);
 
-    const handleChangeUpload = ({ fileList: newFileList }) => {
-        setFileList(newFileList);
-    };
+    const onClickBreadcrumb = (path) => {
+        history.push(path);
+    }
 
     const onLeadChange = (value) => {
         form.setFieldsValue({
@@ -112,63 +112,31 @@ function Home() {
     const renderContentModal = () => {
         return (
             <FormWrapper form={form} onFinish={handleOk}>
-                <Form.Item name='icon' valuePropName="icon" getValueFromEvent={normFile}>
-                    <Upload
-                        accept='.jpg,.png,.jpeg'
-                        listType="picture-card"
-                        showUploadList={{
-                            showPreviewIcon: false,
-                        }}
-                        maxCount={1}
-                        beforeUpload={() => false}
-                        fileList={fileList}
-                        onChange={handleChangeUpload}
-                    >
-                        {fileList.length >= 1 ? null : (
-                            <button
-                                style={{
-                                    border: 0,
-                                    background: 'none',
-                                }}
-                                type="button"
-                            >
-                                <PlusOutlined />
-                                <div
-                                    style={{
-                                        marginTop: 8,
-                                    }}
-                                >
-                                    Icon
-                                </div>
-                            </button>
-                        )}
-                    </Upload>
-                </Form.Item>
                 <Form.Item
-                    name='name'
+                    name='userName'
                     rules={[
                         {
                             required: true,
                         },
                     ]}
                 >
-                    <Input placeholder={'Project name'} />
+                    <Input placeholder={'User name'} />
                 </Form.Item>
                 <Form.Item
-                    name='projectKey'
+                    name='gmail'
                     rules={[
                         {
                             required: true,
                         },
                     ]}
                 >
-                    <Input placeholder={'Project key'} />
+                    <Input placeholder={'Gmail'} />
                 </Form.Item>
                 <Form.Item name='description'>
                     <Input.TextArea placeholder={'Description'} />
                 </Form.Item>
                 <Form.Item
-                    name="lead"
+                    name="role"
                     rules={[
                         {
                             required: true,
@@ -176,14 +144,14 @@ function Home() {
                     ]}
                 >
                     <Select
-                        placeholder="Select a lead"
+                        placeholder="Select a role"
                         onChange={onLeadChange}
                         allowClear
                         suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}
                     >
-                        <Option value="male">male</Option>
-                        <Option value="female">female</Option>
-                        <Option value="other">other</Option>
+                        <Option value="Admin">Admin</Option>
+                        <Option value="Manager">Manager</Option>
+                        <Option value="Employee">Employee</Option>
                     </Select>
                 </Form.Item>
                 <Form.Item>
@@ -200,26 +168,11 @@ function Home() {
         )
     }
 
-    const onRowTable = (record, index) => {
-        history.push('/project/1')
-    }
-
     const onClick = async (_record, event) => {
 
     }
 
     const columns = [
-        {
-            title: <FaStar fontSize={18} color={'#637381'} />,
-            dataIndex: 'is_favorite',
-            key: 'is_favorite',
-            width: 60,
-            render: (_, record) => {
-                const { is_favorite } = record;
-                return is_favorite ? <FaStar fontSize={20} color={'#637381'} /> : <FaRegStar fontSize={20} color={'#637381'} />
-            },
-            sorter: (a, b) => a.is_favorite - b.is_favorite,
-        },
         {
             title: 'Name',
             dataIndex: 'name',
@@ -229,25 +182,25 @@ function Home() {
 
         },
         {
-            title: 'Key',
-            dataIndex: 'key',
-            key: 'key',
-            render: (_, record) => <p>{record.key}</p>,
-            sorter: (a, b) => a.key.localeCompare(b.key),
+            title: 'Gmail',
+            dataIndex: 'gmail',
+            key: 'gmail',
+            render: (_, record) => <p>{record.gmail}</p>,
+            sorter: (a, b) => a.gmail.localeCompare(b.gmail),
         },
         {
-            title: 'Type',
-            dataIndex: 'type',
-            key: 'type',
-            render: (_, record) => <p>{record.type}</p>,
-            sorter: (a, b) => a.type.localeCompare(b.type),
+            title: 'Role',
+            dataIndex: 'role',
+            key: 'role',
+            render: (_, record) => <p>{record.role}</p>,
+            sorter: (a, b) => a.role.localeCompare(b.role),
         },
         {
-            title: 'Lead',
-            dataIndex: 'lead',
-            key: 'lead',
-            render: (_, record) => <p>{record.lead}</p>,
-            sorter: (a, b) => a.lead.localeCompare(b.lead),
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (_, record) => <Switch checked={record.is_active} />,
+            sorter: (a, b) => a.is_active - b.is_active,
         },
         {
             title: 'More actions',
@@ -286,26 +239,29 @@ function Home() {
     return (
         <>
             <ContentLayoutWrapper>
-                <HomeWrapper>
+                <AccountsManagerWrapper>
                     <div className={'headerWrapper'}>
-                        <h1>Projects</h1>
-                        <Button onClick={showModal} type={"primary"}>Create project</Button>
+                        <Breadcrumb>
+                            {itemsBreadcrumb.map(item => {
+                                return (
+                                    <Breadcrumb.Item onClick={() => onClickBreadcrumb(item.path)}>{item.title}</Breadcrumb.Item>
+                                )
+                            })}
+                        </Breadcrumb>
+                        <Button onClick={showModal} type={"primary"}>Create user</Button>
                     </div>
                     <div className={'searchsWrapper'}>
-                        <Input placeholder="Search projects" suffix={<MdOutlineSearch fontSize={20} color={'#637381'} />}/>
+                        <Input placeholder="Search users" suffix={<MdOutlineSearch fontSize={20} color={'#637381'} />}/>
                         <Select
-                            mode="multiple"
                             suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}
-                            placeholder="select one country"
-                            defaultValue={['china']}
+                            placeholder="Status"
                             // onChange={handleChange}
                             options={options}
                             optionRender={(option) => (
                                 <Space>
-                                <span role="img" aria-label={option.data.label}>
-                                  {option.data.emoji}
-                                </span>
-                                    {option.data.desc}
+                                    <span role="img" aria-label={option.data.label}>
+                                      {option.data.label}
+                                    </span>
                                 </Space>
                             )}
                         />
@@ -314,20 +270,15 @@ function Home() {
                         size={"small"}
                         columns={columns}
                         dataSource={data}
-                        onRow={(record, index) => {
-                            return {
-                                onClick: () => onRowTable(record, index)
-                            }
-                        }}
                         showSorterTooltip={{
                             target: 'sorter-icon',
                         }}
                     />
-                </HomeWrapper>
+                </AccountsManagerWrapper>
             </ContentLayoutWrapper>
             <Modal
-                title="Create project"
-                wrapClassName={'modalAddProject'}
+                title="Create user"
+                wrapClassName={'modalAddUser'}
                 open={isModalOpen}
                 onCancel={handleCancel}
                 footer={false}
@@ -339,4 +290,4 @@ function Home() {
     );
 }
 
-export default React.memo(Home);
+export default React.memo(AccountsManager);

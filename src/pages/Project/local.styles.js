@@ -148,4 +148,28 @@ export const SelectOptionItem = styled.div`
   img {
     border-radius: 50%;
   }
+  p {
+    max-width: 100%;
+    overflow: hidden;
+  }
+`
+
+export const EmptySprintWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  > h1 {
+    font-size: 20px;
+    color: var(--second-text-color);
+  }
+  > p {
+    font-size: 14px;
+    color: var(--second-text-color);
+  }
+  button {
+    margin-top: 16px;
+  }
 `
