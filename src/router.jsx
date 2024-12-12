@@ -21,8 +21,8 @@ const publicRoutes = [
 ]
 
 function PrivateRoute({ children, ...rest }) {
-    const isLoggedIn = Auth.isLoggedIn()
-    if (true) return <Route {...rest}>{children}</Route>
+    const isLoggedIn = Auth.isLoggedIn().token;
+    if (isLoggedIn) return <Route {...rest}>{children}</Route>
     return (
         <Redirect
             to={{

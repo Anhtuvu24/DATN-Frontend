@@ -33,6 +33,28 @@ export const TaskWrapper = styled.div`
     justify-content: space-between;
     align-items: center;
     color: var(--second-text-color);
+    .footerLeft {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+  .ant-popover {
+    z-index: 99999999999999999;
+  }
+  .ant-popover-inner {
+    padding: 2px;
+    .ant-menu {
+      border-inline-end: unset;
+      .ant-menu-item {
+        height: 32px;
+        .ant-menu-title-content {
+          > p {
+            line-height: 32px;
+          }
+        }
+      }
+    }
   }
   &:hover {
     cursor: pointer;

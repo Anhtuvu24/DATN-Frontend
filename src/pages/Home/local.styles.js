@@ -60,3 +60,21 @@ export const FormWrapper = styled(Form)`
     height: 102px;
   }
 `
+
+export const OpionSelectUser = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`
+
+export const ProjectName = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
+export const BoxStar = styled.div`
+  &:hover {
+    cursor: pointer;
+  }
+`

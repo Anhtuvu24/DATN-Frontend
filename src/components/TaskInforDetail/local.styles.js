@@ -49,6 +49,9 @@ export const DetailsWrapper = styled.div`
               font-size: 14px;
               color: #44545F;
             }
+            .sprintName {
+              text-transform: capitalize;
+            }
             .ant-select {
               flex: 1;
               max-width: 100%;
@@ -61,6 +64,12 @@ export const DetailsWrapper = styled.div`
               display: flex;
               gap: 8px;
               align-items: center;
+            }
+            .ant-skeleton {
+              width: 100%;
+              .ant-skeleton-button {
+                width: 100%;
+              }
             }
           }
         }
@@ -94,6 +103,7 @@ export const LabelStatusItem = styled.div`
 export const SelectOptionItem = styled.div`
   display: flex;
   align-items: center;
+  gap: 8px;
   img {
     border-radius: 50%;
   }

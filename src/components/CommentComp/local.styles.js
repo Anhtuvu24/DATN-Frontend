@@ -36,6 +36,9 @@ export const CommentItemWrapper = styled.div`
           cursor: pointer;
         }
       }
+      > .ant-skeleton {
+        width: 100%;
+      }
     }
     .footer {
       display: flex;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Space, Menu } from 'antd';
 import { MdGroups } from "react-icons/md";
@@ -8,6 +8,8 @@ import { IoMdSettings } from "react-icons/io";
 // Styles
 import { SidebarWrapper } from './local.styles';
 import {useHistory} from "react-router-dom";
+import {useSelector} from "react-redux";
+import AvatarCustom from "../AvatarCustom";
 
 const items = [
     {
@@ -30,6 +32,7 @@ const items = [
 function Sidebar() {
     const history = useHistory();
     const [collapsed, setCollapsed] = useState(false);
+    const currentProject = useSelector(state => state.main.entities.project?.currentProject) || {};
     const toggleCollapsed = () => {
         setCollapsed(!collapsed);
     };
@@ -50,10 +53,10 @@ function Sidebar() {
     return (
         <SidebarWrapper>
             <div className={'projectInforWrapper'}>
-                <Avatar size={40} shape="square" icon={<UserOutlined />} />
+                {currentProject.name && <AvatarCustom size={40} type={'square'} name={currentProject.name || ''} src={currentProject.icon || ''} />}
                 <div className={'projectName'}>
-                    <h3>Software Development</h3>
-                    <p>Software project</p>
+                    <h3>{currentProject.name}</h3>
+                    <p>{currentProject.project_type_name}</p>
                 </div>
             </div>
             <div className={'menuWrapper'}>

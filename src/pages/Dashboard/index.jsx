@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react'
+import React, {lazy, Suspense, useEffect} from 'react'
 import { Splitter } from "antd";
 
 // Components
@@ -6,7 +6,6 @@ import DashboardRoutes from "./DashboardRoutes.jsx";
 import Sidebar from "../../components/Sidebar/index.jsx";
 
 function Dashboard() {
-
     return (
         <Splitter
             style={{

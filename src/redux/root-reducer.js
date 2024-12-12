@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import App from '../utils/Auth/index'
+import App from './app/reducer.js'
 import main from '../redux/main/reducers'
 
 const appReducer = combineReducers({

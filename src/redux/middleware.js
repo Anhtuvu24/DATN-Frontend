@@ -37,21 +37,24 @@ export function callAPIMiddleware({ dispatch, getState }) {
           Object.assign({}, payload, {
             data: response ? response.data : null,
             type: successType,
+            status: response.status,
           })
         )
       })
       .catch(error => {
+          console.log(error)
         if (axios.isCancel(error)) {
           return
         }
-        const err = error.response?.data
-
+        const err = error.response?.data;
         return dispatch(
           Object.assign({}, payload, {
-            error: String(err?.code),
+            error: String(err?.message),
             type: failureType,
+            status: error.status,
           })
         )
+        // Notification.=
       })
   }
 }

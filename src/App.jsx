@@ -1,7 +1,8 @@
-import React from 'react'
-import { Provider } from 'react-redux'
-import { store, persistor } from './redux/store'
-import { PersistGate } from 'redux-persist/integration/react'
+import React from 'react';
+import { Provider } from 'react-redux';
+import { store, persistor } from './redux/store';
+import Boot from './redux/boot.js';
+import { PersistGate } from 'redux-persist/integration/react';
 
 // Components
 import Routes from "./router.jsx";
@@ -28,5 +29,8 @@ function App() {
     </Provider>
   )
 }
+Boot()
+    .then(() => App())
+    .catch(error => console.error(error))
 
 export default App

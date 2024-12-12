@@ -14,6 +14,7 @@ export const ProjectDetailWrapper = styled.div`
     > h1 {
       font-size: 24px;
       font-weight: 500;
+      text-transform: capitalize;
     }
     .sprintOption {
       display: flex;
@@ -112,6 +113,12 @@ export const FormCreateTask = styled(Form) `
       width: 100%;
       height: 150px;
     }
+    .ant-upload-list {
+      padding: 8px;
+      border: 1px dashed #000000;
+      max-height: 230px;
+      overflow-y: auto;
+    }
   }
 `
 
@@ -145,12 +152,14 @@ export const ListFileWrapper = styled.div`
 export const SelectOptionItem = styled.div`
   display: flex;
   align-items: center;
+  gap: 8px;
   img {
     border-radius: 50%;
   }
   p {
     max-width: 100%;
     overflow: hidden;
+    text-overflow: ellipsis;
   }
 `
 

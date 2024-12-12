@@ -14,6 +14,9 @@ export const MainContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
+  .ant-skeleton-button {
+    width: 100% !important;
+  }
 `
 
 export const NameTask = styled(Input)`
@@ -82,61 +85,10 @@ export const AttachmentsTaskWrapper = styled.div`
     max-height: 200px;
     overflow-y: auto;
     padding: 8px;
-
-    .attachment {
-      display: flex;
-      position: relative;
-      align-items: center;
-      box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    
+    .ant-skeleton-image {
       width: 140px;
       height: 140px;
-      border-radius: 8px;
-      overflow: hidden;
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.5);
-
-        .removeBtn {
-          display: flex;
-        }
-      }
-
-      .ant-image {
-        height: 100%;
-        display: flex;
-        align-items: center;
-
-        img {
-          max-width: 100%;
-        }
-      }
-
-      .removeBtn {
-        display: none;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        top: 4px;
-        right: 4px;
-        padding: 1px;
-        z-index: 100000;
-        background-color: white;
-        border-radius: 4px;
-
-        svg {
-          transition: all 0.2s ease;
-        }
-
-        &:hover {
-          cursor: pointer;
-          background-color: #e1e0e0;
-          svg {
-            fill: var(--main-color);
-          }
-        }
-
-        //display: none;
-      }
     }
 
     .attachmentAdd {
@@ -209,6 +161,9 @@ export const ActivityWrapper = styled.div`
         margin-bottom: 12px;
       }
     }
+    > .ant-skeleton {
+      width: 100%;
+    }
   }
   .listCommentWrapper {
     width: 100%;
@@ -218,4 +173,12 @@ export const ActivityWrapper = styled.div`
     margin-top: 24px;
   }
 `
+
+export const MentionLabelWrapper = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`
+
+
 

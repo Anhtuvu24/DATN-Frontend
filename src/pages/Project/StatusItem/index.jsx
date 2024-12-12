@@ -6,7 +6,7 @@ import { StatusItemWrapper } from './local.styles.js';
 function StatusItem({ status, isScrolled }) {
     return (
         <StatusItemWrapper isScrolled={isScrolled}>
-            <p>{status.title}</p>
+            <p>{status.name}</p>
         </StatusItemWrapper>
     )
 }

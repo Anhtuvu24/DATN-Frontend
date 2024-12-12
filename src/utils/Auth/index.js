@@ -1,10 +1,11 @@
 const isLoggedIn = () => {
-  return localStorage.getItem('token')
+  return {token: localStorage.getItem('token'), refreshToken: localStorage.getItem('refreshToken')}
 }
 
 const setUser = user => {
-  const { auth_token: token } = user
-  localStorage.setItem('token', token)
+  const { accessToken, refreshToken } = user
+  localStorage.setItem('token', accessToken)
+  localStorage.setItem('refreshToken', refreshToken)
 }
 
 const getToken = () => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { IoMdAdd } from "react-icons/io";
 import { Button } from "antd";
 import { Droppable } from 'react-beautiful-dnd';
@@ -10,6 +10,11 @@ import Task from "../Task/index.jsx";
 import { TasksWrapper } from './local.styles.js';
 
 function Tasks({ id, tasks, setRecord, onClickCreateTask }) {
+
+    const _tasks = useMemo(() => {
+        const newTasks = tasks.sort((a,  b) => a.index - b.index);
+        return newTasks;
+    }, [tasks]);
 
     const openCreateTask = () => {
         setRecord(id);
@@ -24,7 +29,7 @@ function Tasks({ id, tasks, setRecord, onClickCreateTask }) {
                     {...provided.droppableProps}
                 >
                     <TasksWrapper>
-                        {tasks.map((item, index) => {
+                        {_tasks.map((item, index) => {
                             return (
                                 <Task id={item.id} index={index} key={item.id} task={item} />
                             )

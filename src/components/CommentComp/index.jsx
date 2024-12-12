@@ -1,25 +1,35 @@
 import React, {useEffect, useState} from 'react';
-import { Avatar, Button, Form, Mentions, Space } from "antd";
+import {Avatar, Button, Form, Input, Mentions, Popconfirm, Space} from "antd";
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
+dayjs.extend(customParseFormat);
 // Styles
 import {CommentItemWrapper} from "./local.styles.js";
+import {useDispatch, useSelector} from "react-redux";
+import AvatarCustom from "../AvatarCustom/index.jsx";
+import {deleteComment, updateComment} from "../../redux/main/actions/comment.js";
+import createNotification from "../../utils/notificationHelper.js";
 
 const { getMentions } = Mentions;
 
-function CommentComp() {
-    const defaultValue = '@Hải Yến Nguyễn Thị verify';
-    // const [comment, setComment] = useState('@Hải Yến Nguyễn Thị verify');
+function CommentComp({ item }) {
+    const dispatch = useDispatch();
+    const { id, text, created_at, updated_at, user } = item;
+    const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
     const [disableSave, setDisableSave] = useState(true);
     const [isEditComment, setIsEditComment] = useState(false);
     const [form] = Form.useForm();
 
+    const me = useSelector(state => state.main.entities.auth.user) || {};
+
     useEffect(() => {
-        if (defaultValue) {
+        if (text) {
             setDisableSave(false);
         }
         if (isEditComment) {
             form.setFieldsValue({
-                comment: defaultValue,
+                comment: text,
             })
         }
     }, [isEditComment])
@@ -29,72 +39,76 @@ function CommentComp() {
         setIsEditComment(false)
     };
 
-    const onFinish = async () => {
+    const onFinish = async (values) => {
+        setIsLoadingUpdate(true);
         try {
-            const values = await form.validateFields();
+            // const values = await form.validateFields();
             const { comment } = values;
-            const mentions = getMentions(comment);
+            // const mentions = getMentions(comment);
+            const res = await dispatch(updateComment(id, comment));
+            if (res.status === 200) {
+                createNotification('success', 'Updated comment success');
+            } else {
+                createNotification('error', 'Updated comment fail');
+            }
             form.resetFields();
             setIsEditComment(false);
         } catch (errInfo) {
             console.log('Error:', errInfo);
         }
+        setIsLoadingUpdate(false);
     };
 
     const onEdit = () => {
         setIsEditComment(true);
     }
 
-    const onChangeComment = (text) => {
+    const onChangeComment = (e) => {
+        const value = e.target.value;
         // setComment(text);
-        if (text) {
+        if (value) {
             setDisableSave(false);
         } else {
             setDisableSave(true)
         }
         form.setFieldsValue({
-            comment: text,
+            comment: value,
         })
+    }
+
+    const onConfirmDelete = async () => {
+        const res = await dispatch(deleteComment(id));
+        if (res.status === 200) {
+            createNotification('success', 'Deleted comment success');
+        } else {
+            createNotification('error', 'Deleted comment fail');
+        }
     }
 
     return (
         <CommentItemWrapper>
             <div className={'blockAvatar'}>
-                <Avatar size={32}>V</Avatar>
+                <AvatarCustom size={32} src={user?.avatar || ''} name={user?.user_name || ''} />
             </div>
             <div className={'commentWrapper'}>
                 <div className={'headerComment'}>
-                    <p className={'userName'}>Anh Tu</p>
-                    <p className={'timeCreated'}>November 25/2024 at 10:27 AM</p>
+                    <p className={'userName'}>{user?.user_name}</p>
+                    <p className={'timeCreated'}>{dayjs(created_at, 'YYYY-MM-DD HH:mm:ss').format('MMMM D, YYYY [at] h:mm A')}</p>
                 </div>
                 <div className={'bodyComment'}>
                     {isEditComment ? (
                         <Form form={form} layout="horizontal" onFinish={onFinish}>
                             <Form.Item name={'comment'}>
-                                <Mentions
+                                <Input.TextArea
                                     autoSize={{ maxRows: 6, minRows: 2 }}
                                     placeholder="Add comment"
-                                    options={[
-                                        {
-                                            value: 'afc163',
-                                            label: 'afc163',
-                                        },
-                                        {
-                                            value: 'zombieJ',
-                                            label: 'zombieJ',
-                                        },
-                                        {
-                                            value: 'yesmeck',
-                                            label: 'yesmeck',
-                                        },
-                                    ]}
                                     onChange={onChangeComment}
                                 />
                             </Form.Item>
                             {isEditComment ? (
                                 <Form.Item>
                                     <Space wrap>
-                                        <Button htmlType="submit" type="primary" disabled={disableSave}>
+                                        <Button loading={isLoadingUpdate} htmlType="submit" type="primary" disabled={disableSave}>
                                             Save
                                         </Button>
                                         <Button htmlType="button" type="text" onClick={onReset}>
@@ -105,13 +119,15 @@ function CommentComp() {
                             ) : null}
                         </Form>
                     ) : (
-                        <p><span className={'mentionItem'}>@Hải Yến Nguyễn Thị</span> verify</p>
+                        <p>{text}</p>
                     )}
                 </div>
-                {!isEditComment && (
+                {(!isEditComment && user?.id === me.id) && (
                     <div className={'footer'}>
                         <p onClick={onEdit}>Edit</p>
-                        <p>Delete</p>
+                        <Popconfirm title={'Delete this comment?'} onConfirm={onConfirmDelete}>
+                            <p>Delete</p>
+                        </Popconfirm>
                     </div>
                 )}
             </div>

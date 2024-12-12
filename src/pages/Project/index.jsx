@@ -1,9 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Avatar, Breadcrumb, Button, Input, Dropdown, Modal, Form, Space, DatePicker, Select, Upload } from "antd";
+import {
+    Avatar,
+    Breadcrumb,
+    Button,
+    Input,
+    Dropdown,
+    Modal,
+    Form,
+    Space,
+    DatePicker,
+    Select,
+    Upload,
+    Popconfirm
+} from "antd";
 import { SlOptions } from "react-icons/sl";
 import { MdOutlineSearch, MdUpload } from "react-icons/md";
 import { DragDropContext } from 'react-beautiful-dnd';
 import moment from "moment";
+import dayjs from 'dayjs';
 
 // Components
 import CKEditorCustom from "../../components/CKEditor/index.jsx";
@@ -21,7 +35,13 @@ import {
 import StatusesTask from "./StatusesTask";
 import Tasks from "./Tasks";
 import FileComp from "../../components/FileComp";
-import {useHistory} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {getProject} from "../../redux/main/actions/project.js";
+import {completeSprint, createSprint, updateSprint} from "../../redux/main/actions/sprint.js";
+import createNotification from "../../utils/notificationHelper.js";
+import {createTask, getTasks, updateOrderTask} from "../../redux/main/actions/task.js";
+import AvatarCustom from "../../components/AvatarCustom/index.jsx";
 
 const users = ['V', 'A', 'T'];
 
@@ -31,92 +51,6 @@ const items = [
         label: <p>Edit sprint</p>,
     },
 ];
-
-const itemsBreadcrumb = [
-    {
-        title: 'Projects',
-        path: '/home'
-    },
-    {
-        title: 'Software Development',
-        path: '/project/1'
-    },
-];
-
-const initData = [
-    {
-        id: 'category-1',
-        title: 'to-do',
-        tasks: [
-            {
-                id: `task-1.1`,
-                title: 'Test 1.1',
-            },
-            {
-                id: `task-1.2`,
-                title: 'Test 1.2',
-            },
-            {
-                id: `task-1.3`,
-                title: 'Test 1.3',
-            },
-        ],
-    },
-    {
-        id: 'category-2',
-        title: 'inprogess',
-        tasks: [
-            {
-                id: `task-2.1`,
-                title: 'Test 2.1',
-            },
-            {
-                id: `task-2.2`,
-                title: 'Test 2.2',
-            },
-            {
-                id: `task-2.3`,
-                title: 'Test 3.3',
-            },
-        ],
-    },
-    {
-        id: 'category-3',
-        title: 'ready for test',
-        tasks: [
-            {
-                id: `task-3.1`,
-                title: 'Test 3.1',
-            },
-            {
-                id: `task-3.2`,
-                title: 'Test 3.2',
-            },
-            {
-                id: `task-3.3`,
-                title: 'Test 3.3',
-            },
-        ],
-    },
-    {
-        id: 'category-4',
-        title: 'Done',
-        tasks: [
-            {
-                id: `task-4.1`,
-                title: 'Test 4.1',
-            },
-            {
-                id: `task-4.2`,
-                title: 'Test 4.2',
-            },
-            {
-                id: `task-4.3`,
-                title: 'Test 4.3',
-            },
-        ],
-    }
-]
 
 const priorityOption = [
     {
@@ -128,7 +62,7 @@ const priorityOption = [
         label: <span>Medium</span>
     },
     {
-        value: 'High',
+        value: 'high',
         label: <span>High</span>
     },
 ]
@@ -148,17 +82,67 @@ const disabledDate = (current) => {
 };
 
 function Project() {
+    const dispatch = useDispatch();
     const history = useHistory();
+    const params = useParams();
+    const projectId = params.id;
+
+    const [isCreateTask, setIsCreateTask] = useState(false);
+    const [isGetTasks, setIsGetTasks] = useState(false);
+    const [isCompleteSprint, setIsCompleteSprint] = useState(false);
+    const [isCreateSprint, setIsCreateSprint] = useState(false);
+    const [isUpdateSprint, setIsUpdateSprint] = useState(false);
     const [isModalSprintOpen, setIsModalSprintOpen] = useState(false);
     const [isModalCreateSprintOpen, setIsModalCreateSprintOpen] = useState(false);
     const [isModalCreateTaskOpen, setIsModalCreateTaskOpen] = useState(false);
+
     const [record, setRecord] = useState(null);
     const [usersSelect, setUsersSelect] = useState([]);
-    const [categories, setCategories] = useState(initData)
+    // const [categories, setCategories] = useState([])
     const [fileList, setFileList] = useState([]);
     const [form] = Form.useForm();
+    const [formUpdateSprint] = Form.useForm();
+    const [formTask] = Form.useForm();
 
     const [isScrolled, setIsScrolled] = useState(false);
+
+    const me = useSelector(state => state.main.entities.auth.user) || {};
+    const users = useSelector(state => state.main.entities.user.users) || [];
+    const currentProject = useSelector(state => state.main.entities.project?.currentProject) || {};
+    const { active_sprints = [] } = currentProject || {};
+    const tasks = useSelector(state => state.main.entities.task.tasks) || {};
+    const categories = tasks[active_sprints[0]?.id] || [];
+
+    const itemsBreadcrumb = [
+        {
+            title: 'Projects',
+            path: '/home'
+        },
+        {
+            title: currentProject.name,
+            path: `/project/${currentProject.id}`
+        },
+    ];
+
+    useEffect(() => {
+        const getTasksFetch = async () => {
+            setIsGetTasks(true);
+            const res = await dispatch(getTasks(active_sprints[0].id));
+            if (res.status === 200) {
+                // setCategories(res.data.tasks_by_status);
+            } else {
+                createNotification('error', 'Get tasks error!')
+            }
+            setIsGetTasks(false);
+        }
+        if (active_sprints.length) {
+            getTasksFetch();
+        }
+    }, [active_sprints])
+
+    useEffect(() => {
+        dispatch(getProject(projectId));
+    }, [projectId])
 
     useEffect(() => {
         const tasksContainer = document.querySelector('.TasksWrapper');
@@ -173,6 +157,8 @@ function Project() {
             };
         }
     }, []);
+
+
 
     const handleChangeUpload = ({ fileList: newFileList }) => {
         setFileList(newFileList);
@@ -189,49 +175,132 @@ function Project() {
 
     const onClickSettingSprint = ({ item, key }) => {
         if (key === 'edit_sprint') {
+            formUpdateSprint.setFieldsValue({
+                sprintName: active_sprints[0].name,
+                startDate: dayjs(active_sprints[0].start_date, 'YYYY-MM-DD'),
+                endDate: dayjs(active_sprints[0].end_date, 'YYYY-MM-DD'),
+            });
             setIsModalSprintOpen(true)
         }
+    }
+
+    const onCreateSprint = async (values) => {
+        setIsCreateSprint(true);
+        const { endDate, startDate } = values;
+        const endDateString = dayjs(endDate).format('YYYY-MM-DD HH:mm:ss');
+        const startDateString = dayjs(startDate).format('YYYY-MM-DD HH:mm:ss');
+        const res = await dispatch(createSprint({
+            id_project: projectId,
+            end_date: endDateString,
+            start_date: startDateString
+        }))
+        if (res.status === 201 || res.status === 200) {
+            form.resetFields();
+            createNotification('success', isModalCreateSprintOpen ? 'Create sprint success!' : 'Update sprint success');
+            setIsCreateSprint(false);
+            setIsModalCreateSprintOpen(false);
+        } else {
+            createNotification('error', isModalCreateSprintOpen ? 'Create sprint fail!' : 'Update sprint fail');
+            setIsCreateSprint(false);
+        }
+        form.resetFields();
+    }
+
+    const onuUpdateSprint = async (values) => {
+        setIsUpdateSprint(true);
+        const { endDate, startDate, sprintName } = values;
+        const endDateString = dayjs(endDate).format('YYYY-MM-DD HH:mm:ss');
+        const startDateString = dayjs(startDate).format('YYYY-MM-DD HH:mm:ss');
+        const res = await dispatch(updateSprint(
+            active_sprints[0]?.id,
+            {
+                name: sprintName,
+                end_date: endDateString,
+                start_date: startDateString
+            }
+        ))
+        if (res.status === 201 || res.status === 200) {
+            formUpdateSprint.resetFields();
+            createNotification('success', 'Update sprint success');
+            setIsUpdateSprint(false);
+            setIsModalSprintOpen(false);
+        } else {
+            createNotification('error', 'Update sprint fail');
+            setIsUpdateSprint(false);
+        }
+    }
+
+    const onCreateTask = async (values) => {
+        setIsCreateTask(true);
+        const { expriedDate, assignee, description, name, priority, upload } = values;
+        const listFileOri = upload && upload.map(item => item.originFileObj);
+        const data = {
+            id_status: record,
+            id_assignee: assignee,
+            id_reporter: me.id,
+            id_sprint: active_sprints[0].id,
+            name,
+            priority,
+            description,
+            expired_at: dayjs(expriedDate).format('YYYY-MM-DD'),
+            files: listFileOri,
+        }
+        const res = await dispatch(createTask(data));
+        if (res.status === 201 || res.status === 200) {
+            createNotification('success', 'Create task success!')
+            setIsModalCreateTaskOpen(false);
+            formTask.resetFields();
+        } else {
+            createNotification('error', 'Create task error!')
+        }
+        setIsCreateTask(false);
     }
 
     const handleCancel = () => {
         if (isModalSprintOpen) {
             setIsModalSprintOpen(false);
+            formUpdateSprint.resetFields();
         }
         if (isModalCreateSprintOpen) {
             setIsModalCreateSprintOpen(false);
+            form.resetFields();
         }
         if (isModalCreateTaskOpen) {
             setIsModalCreateTaskOpen(false);
             setFileList([])
+            formTask.resetFields();
         }
-        form.resetFields();
     }
 
     const renderContentModalSprint = () => {
         return (
             <FormEditSprint
-                form={form}
+                form={formUpdateSprint}
+                onFinish={onuUpdateSprint}
                 labelAlign={'left'}
                 labelCol={{
                     flex: '110px'
                 }}
+                initialValues={isModalSprintOpen ? {
+                    sprintName: active_sprints[0].name,
+                    startDate: dayjs(active_sprints[0].start_date, 'YYYY-MM-DD'),
+                    endDate: dayjs(active_sprints[0].end_date, 'YYYY-MM-DD'),
+                } : {}}
             >
                 <Form.Item>
                     <p className={'note'}>Required fields are marked with an asterisk <span>*</span></p>
                 </Form.Item>
-                {isModalSprintOpen && (
-                    <Form.Item
-                        label={'Sprint name'}
-                        name='sprintName'
-                        rules={[
-                            {
-                                required: true,
-                            },
-                        ]}
-                    >
-                        <Input placeholder={'Sprint name'} />
-                    </Form.Item>
-                )}
+                <Form.Item
+                    label={'Sprint name'}
+                    name='sprintName'
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <Input placeholder={'Sprint name'} />
+                </Form.Item>
                 <Form.Item
                     required={true}
                     name='startDate'
@@ -242,7 +311,7 @@ function Project() {
                         },
                     ]}
                 >
-                    <DatePicker showTime />
+                    <DatePicker />
                 </Form.Item>
                 <Form.Item
                     required={true}
@@ -254,12 +323,63 @@ function Project() {
                         },
                     ]}
                 >
-                    <DatePicker showTime />
+                    <DatePicker />
                 </Form.Item>
                 <Form.Item>
                     <Space>
-                        <Button type="primary" htmlType="submit">
+                        <Button loading={isUpdateSprint} type="primary" htmlType="submit">
                             Update
+                        </Button>
+                        <Button htmlType="button" onClick={handleCancel}>
+                            Cancel
+                        </Button>
+                    </Space>
+                </Form.Item>
+            </FormEditSprint>
+        )
+    }
+
+    const renderContentModalCreateSprint = () => {
+        return (
+            <FormEditSprint
+                form={form}
+                onFinish={onCreateSprint}
+                labelAlign={'left'}
+                labelCol={{
+                    flex: '110px'
+                }}
+            >
+                <Form.Item>
+                    <p className={'note'}>Required fields are marked with an asterisk <span>*</span></p>
+                </Form.Item>
+                <Form.Item
+                    required={true}
+                    name='startDate'
+                    label="Start date"
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <DatePicker />
+                </Form.Item>
+                <Form.Item
+                    required={true}
+                    name='endDate'
+                    label="End date"
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <DatePicker />
+                </Form.Item>
+                <Form.Item>
+                    <Space>
+                        <Button loading={isCreateSprint} type="primary" htmlType="submit">
+                            Create
                         </Button>
                         <Button htmlType="button" onClick={handleCancel}>
                             Cancel
@@ -273,10 +393,15 @@ function Project() {
     const renderContentModalCreateTask = () => {
         return (
             <FormCreateTask
-                form={form}
+                form={formTask}
                 labelAlign={'left'}
                 labelCol={{
                     flex: '110px'
+                }}
+                onFinish={onCreateTask}
+                initialValues={{
+                    assignee: users[0]?.id,
+                    priority: 'medium'
                 }}
             >
                 <Form.Item>
@@ -306,50 +431,26 @@ function Project() {
                     rules={[
                         {
                             required: true,
-                            message: 'Please input!',
                         },
                     ]}
                 >
-                    <Select style={{ height: 40 }} suffixIcon={false} showSearch={true}>
-                        <Option value="apple">
-                            <SelectOptionItem>
-                                <img
-                                    src="https://firebasestorage.googleapis.com/v0/b/datn-1af41.firebasestorage.app/o/avatars%2F1732561620989-default-user.png?alt=media&token=eef741cb-385c-4d42-91cc-1d5eecf9ab74"
-                                    alt="apple"
-                                    style={{ marginRight: 8 }}
-                                    width={24}
-                                />
-                                Apple
-                            </SelectOptionItem>
-                        </Option>
-                        <Option value="banana">
-                            <SelectOptionItem>
-                                <img
-                                    src="https://via.placeholder.com/20"
-                                    alt="banana"
-                                    style={{ marginRight: 8 }}
-                                    width={24}
-                                />
-                                Banana
-                            </SelectOptionItem>
-                        </Option>
-                        <Option value="cherry">
-                            <SelectOptionItem>
-                                <img
-                                    src="https://via.placeholder.com/20"
-                                    alt="cherry"
-                                    style={{ marginRight: 8 }}
-                                    width={24}
-                                />
-                                Cherry
-                            </SelectOptionItem>
-                        </Option>
+                    <Select defaultValue={users[0]?.id} style={{ height: 40 }} suffixIcon={false} showSearch={true}>
+                        {users.map(item => {
+                            return (
+                                <Option value={item.id} key={item?.id}>
+                                    <SelectOptionItem>
+                                        <AvatarCustom size={24} name={item?.user_name} src={item?.avatar} />
+                                        <p>{item?.user_name}</p>
+                                    </SelectOptionItem>
+                                </Option>
+                            )
+                        })}
                     </Select>
                 </Form.Item>
                 <Form.Item
                     required={true}
-                    name='Expried date'
-                    label="expriedDate"
+                    name='expriedDate'
+                    label="Expried date"
                     rules={[
                         {
                             required: true,
@@ -373,32 +474,33 @@ function Project() {
                         accept='.jpg,.png,.jpeg'
                         multiple={true}
                         name="attachment"
-                        listType="picture"
+                        listType="picture-card"
                         className={'uploadWrapper'}
                         beforeUpload={() => false}
                         fileList={fileList}
                         onChange={handleChangeUpload}
-                        showUploadList={false}
+                        showUploadList={{ showPreviewIcon: false }}
+                        showPreview={false}
                     >
-                        {fileList.length ? (
-                            <ListFileWrapper>
-                                {fileList.map((item, index) => {
-                                    return (
-                                        <FileComp file={item} size={'100px'} />
-                                    )
-                                })}
-                            </ListFileWrapper>
-                        ) : (
+                        {/*{fileList.length ? (*/}
+                        {/*    <ListFileWrapper>*/}
+                        {/*        {fileList.map((item, index) => {*/}
+                        {/*            return (*/}
+                        {/*                <FileComp file={item} size={'100px'} />*/}
+                        {/*            )*/}
+                        {/*        })}*/}
+                        {/*    </ListFileWrapper>*/}
+                        {/*) : (*/}
                             <UploadAreaWrapper>
                                 <MdUpload fontSize={20} color={'#637381'} /> Attachments
                             </UploadAreaWrapper>
 
-                        )}
+                        {/*)}*/}
                     </Upload>
                 </Form.Item>
                 <Form.Item>
                     <Space>
-                        <Button type="primary" htmlType="submit">
+                        <Button loading={isCreateTask} type="primary" htmlType="submit">
                             Create
                         </Button>
                         <Button htmlType="button" onClick={handleCancel}>
@@ -418,7 +520,7 @@ function Project() {
         setIsModalCreateSprintOpen(true);
     }
 
-    const onDragEnd = (result) => {
+    const onDragEnd = async (result) => {
         const { source, destination } = result;
 
         if (!destination) return;
@@ -436,28 +538,51 @@ function Project() {
 
             const [movedTask] = sourceTasks.splice(source.index, 1);
 
-            if (source.droppableId === destination.droppableId) {
-                sourceTasks.splice(destination.index, 0, movedTask);
-                setCategories(categories.map(cat =>
-                    cat.id === sourceCategory.id
-                        ? { ...cat, tasks: sourceTasks }
-                        : cat
-                ));
-            } else {
-                destTasks.splice(destination.index, 0, movedTask);
-                setCategories(categories.map(cat =>
-                    cat.id === sourceCategory.id
-                        ? { ...cat, tasks: sourceTasks }
-                        : cat.id === destCategory.id
-                            ? { ...cat, tasks: destTasks }
-                            : cat
-                ));
+            // if (source.droppableId === destination.droppableId) {
+            //     sourceTasks.splice(destination.index, 0, movedTask);
+            //     setCategories(categories.map(cat =>
+            //         cat.id === sourceCategory.id
+            //             ? { ...cat, tasks: sourceTasks }
+            //             : cat
+            //     ));
+            // } else {
+            //     destTasks.splice(destination.index, 0, movedTask);
+            //     setCategories(categories.map(cat =>
+            //         cat.id === sourceCategory.id
+            //             ? { ...cat, tasks: sourceTasks }
+            //             : cat.id === destCategory.id
+            //                 ? { ...cat, tasks: destTasks }
+            //                 : cat
+            //     ));
+            // }
+            // Gọi Redux và backend để đồng bộ
+            const res = await dispatch(updateOrderTask({
+                taskId: movedTask.id,
+                id_status: movedTask.id_status,
+                id_sprint: movedTask.id_sprint,
+                sourceIndex: source.index,
+                destIndex: destination.index,
+                destinationStatus: destination.droppableId,
+            }));
+            if (res.status !== 200) {
+                createNotification('error', 'Change status fail!');
             }
         }
     };
 
     const onClickBreadcrumb = (path) => {
         history.push(path);
+    }
+
+    const onComfirmComplete = async () => {
+        setIsCompleteSprint(true);
+        const res = await dispatch(completeSprint(active_sprints[0].id, {is_close: true}));
+        if (res.status === 200) {
+            createNotification('success', 'Completed sprint success!');
+        } else {
+            createNotification('error', 'Completed sprint fail!');
+        }
+        setIsCompleteSprint(false);
     }
 
     return (
@@ -470,19 +595,21 @@ function Project() {
                         )
                     })}
                 </Breadcrumb>
-                {true ? (
+                {!active_sprints?.length ? (
                     <EmptySprintWrapper>
-                        <h1>Empty sprint</h1>
+                        <h1>Empty sprint active</h1>
                         <p>Create a sprint to start work</p>
                         <Button type={"primary"} onClick={onClickCreateSprint}>Create sprint</Button>
                     </EmptySprintWrapper>
                 ) : (
                     <>
                         <div className={'sprintHeader'}>
-                            <h1>SD Sprint 10</h1>
+                            <h1>{currentProject.key} {active_sprints[0]?.name}</h1>
                             <div className={'sprintOption'}>
-                                <p>Kết thúc vào 22/12/2024</p>
-                                <Button type={"primary"}>Complete sprint</Button>
+                                <p>End time: {moment(active_sprints[0]?.end_date).format('DD/MM/YYYY')}</p>
+                                <Popconfirm title={'Do you want to complete this sprint?'} onConfirm={onComfirmComplete}>
+                                    <Button loading={isCompleteSprint} type={"primary"}>Complete sprint</Button>
+                                </Popconfirm>
                                 <Dropdown
                                     menu={{
                                         items,
@@ -503,14 +630,14 @@ function Project() {
                                 {users.map((item, index) => {
                                     return (
                                         <UserItem key={`user-${index}`} is_select={usersSelect.includes(item) || undefined} onClick={() => onSelect(item)} className={'userItem'}>
-                                            <Avatar size={32}>{item}</Avatar>
+                                            <AvatarCustom size={32} name={item?.user_name} src={item?.avatar} />
                                         </UserItem>
                                     )
                                 })}
                             </div>
                         </div>
                         <div className={'TasksWrapper'}>
-                            <StatusesTask isScrolled={isScrolled} categories={categories} />
+                            <StatusesTask isScrolled={isScrolled} />
                             <DragDropContext onDragEnd={onDragEnd}>
                                 <div className={'tasksContainer'}>
                                     {categories.map((item, index) => {
@@ -531,14 +658,24 @@ function Project() {
 
             </ProjectDetailWrapper>
             <Modal
-                title={isModalCreateSprintOpen ? "Create sprint" : "Edit sprint"}
+                title={"Edit sprint"}
                 wrapClassName={'modalAddProject'}
-                open={isModalSprintOpen || isModalCreateSprintOpen}
+                open={isModalSprintOpen}
                 onCancel={handleCancel}
                 footer={false}
                 getContainer={triggerNode => triggerNode}
             >
                 {renderContentModalSprint()}
+            </Modal>
+            <Modal
+                title={"Create sprint"}
+                wrapClassName={'modalAddProject'}
+                open={isModalCreateSprintOpen}
+                onCancel={handleCancel}
+                footer={false}
+                getContainer={triggerNode => triggerNode}
+            >
+                {renderContentModalCreateSprint()}
             </Modal>
             <Modal
                 title="Create task"

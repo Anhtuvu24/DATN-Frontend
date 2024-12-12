@@ -11,7 +11,7 @@ const privateRoutes = [
         exact: true,
     },
     {
-        path: 'task/:id',
+        path: 'project/:idProject/task/:id',
         component: lazy(() => import('../TaskDetail')),
         exact: true,
     },

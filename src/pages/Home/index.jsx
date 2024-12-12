@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
-import {Button, Input, Select, Space, Table, Dropdown, Modal, Form, Upload, Menu, Popover} from "antd";
+import React, {useEffect, useState} from 'react';
+import {Button, Input, Select, Space, Table, Dropdown, Modal, Form, Upload, Menu, Popover, Popconfirm} from "antd";
 import { PlusOutlined } from '@ant-design/icons';
 import { MdOutlineSearch, MdKeyboardArrowDown } from "react-icons/md";
 import { FaStar, FaRegStar  } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
+import { useDebounce } from 'use-debounce';
 
 // Styles
-import { HomeWrapper, MoreOption, FormWrapper } from './local.styles';
+import {HomeWrapper, MoreOption, FormWrapper, OpionSelectUser, ProjectName, BoxStar} from './local.styles';
 import { ContentLayoutWrapper } from "../../components/MainLayout/local.styles.js";
 import {useHistory} from "react-router-dom";
+import AvatarCustom from "../../components/AvatarCustom";
+import {useDispatch, useSelector} from "react-redux";
+import {createProject, deleteProject, getProjects, updateProject} from "../../redux/main/actions/project.js";
+import createNotification from "../../utils/notificationHelper.js";
 
 const options = [
     {
@@ -37,42 +42,6 @@ const options = [
     },
 ];
 
-const items = [
-    {
-        key: 'project_setting',
-        label: <p>Project settings</p>,
-    },
-    {
-        key: 'move_to_trash',
-        label: 'Move to trash',
-    },
-];
-
-const data = [
-    {
-        is_favorite: true,
-        name: 'Business Analysis-1',
-        key: 'BA-1',
-        type: 'ATeam-managed software-1',
-        lead: 'Anh Tu-1',
-    },
-
-    {
-        is_favorite: false,
-        name: 'Business Analysis',
-        key: 'BA',
-        type: 'Team-managed software',
-        lead: 'Anh Tu',
-    },
-    {
-        is_favorite: true,
-        name: 'Business Analysis-2',
-        key: 'BA-2',
-        type: 'BTeam-managed software-1',
-        lead: 'Anh Tu-2',
-    },
-];
-
 const { Option } = Select;
 
 const normFile = (e) => {
@@ -83,11 +52,46 @@ const normFile = (e) => {
 };
 
 function Home() {
+    const dispatch = useDispatch();
     const history = useHistory();
+
+    const users = useSelector(state => state.main.entities.user.users) || [];
+    const projects = useSelector(state => state.main.entities.project?.projects?.data) || [];
+    const projectTypes = useSelector(state => state.main.entities.project_type?.project_types?.data) || [];
+
+    const [recordOption, setRecordOption] = useState(null);
+    const [isCreateProject, setIsCreateProject] = useState(false);
+    const [isGetProjects, setIsGetProjects] = useState(true);
     const [open, setOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
     const [fileList, setFileList] = useState([]);
+
+    const [query, setQuery] = useState({ search: '' });
+    const [debouncedQuery] = useDebounce(query, 500);
+
+    useEffect(() => {
+        const fetchGetProjects = async () => {
+            setIsGetProjects(true);
+            const res = await dispatch(getProjects(1, 100, debouncedQuery.search));
+            if (res.status === 200) {
+                setIsGetProjects(false);
+            } else {
+                createNotification('error', 'Get projects error');
+                setIsGetProjects(false);
+            }
+        }
+        fetchGetProjects();
+    }, [debouncedQuery])
+
+    const onChangeFavorite = (e, record) => {
+        e.stopPropagation();
+        const dataRes = {
+            id: record.id,
+            is_favorite: !record.is_favorite,
+        }
+        dispatch(updateProject(dataRes))
+    }
 
     const handleChangeUpload = ({ fileList: newFileList }) => {
         setFileList(newFileList);
@@ -98,20 +102,56 @@ function Home() {
             lead: value,
         });
     };
+
+    const onTypeChange = (value) => {
+        form.setFieldsValue({
+            id_type: value,
+        });
+    };
+
     const showModal = () => {
         setIsModalOpen(true);
     };
-    const handleOk = (values) => {
-        setIsModalOpen(false);
-        form.resetFields();
+    const handleOk = async (values) => {
+        setIsCreateProject(true);
+        const { description, icon, lead, id_type, name, projectKey } = values;
+        const res = await dispatch(createProject({
+            id_type,
+            id_lead: lead,
+            name,
+            key: projectKey,
+            icon: fileList[0]?.originFileObj || null,
+            description
+        }))
+        if (res.status === 201 || res.status === 200) {
+            createNotification('success', 'Create project success!');
+            setIsCreateProject(false)
+            setIsModalOpen(false);
+            setFileList([])
+            form.resetFields();
+        } else {
+            createNotification('error', 'Create project error!');
+            setIsCreateProject(false)
+            setIsModalOpen(false);
+        }
     };
     const handleCancel = () => {
         setIsModalOpen(false);
+        setIsCreateProject(false)
+        setFileList([])
+        form.resetFields();
     };
 
     const renderContentModal = () => {
         return (
-            <FormWrapper form={form} onFinish={handleOk}>
+            <FormWrapper
+                form={form}
+                onFinish={handleOk}
+                initialValues={{
+                    lead: users[0]?.id,
+                    id_type: projectTypes[0]?.id,
+                }}
+            >
                 <Form.Item name='icon' valuePropName="icon" getValueFromEvent={normFile}>
                     <Upload
                         accept='.jpg,.png,.jpeg'
@@ -164,6 +204,31 @@ function Home() {
                 >
                     <Input placeholder={'Project key'} />
                 </Form.Item>
+                <Form.Item
+                    name="id_type"
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <Select
+                        showSearch={true}
+                        defaultValue={projectTypes[0]?.id}
+                        placeholder="Select a type"
+                        onChange={onTypeChange}
+                        allowClear
+                        suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}
+                    >
+                        {projectTypes.map((item, index) => {
+                            return (
+                                <Option value={item?.id} key={item?.id}>
+                                    {item.name}
+                                </Option>
+                            )
+                        })}
+                    </Select>
+                </Form.Item>
                 <Form.Item name='description'>
                     <Input.TextArea placeholder={'Description'} />
                 </Form.Item>
@@ -176,19 +241,28 @@ function Home() {
                     ]}
                 >
                     <Select
+                        showSearch={true}
+                        defaultValue={users[0]?.id}
                         placeholder="Select a lead"
                         onChange={onLeadChange}
                         allowClear
                         suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}
                     >
-                        <Option value="male">male</Option>
-                        <Option value="female">female</Option>
-                        <Option value="other">other</Option>
+                        {users.map((item, index) => {
+                            return (
+                                <Option value={item?.id} key={item?.id}>
+                                    <OpionSelectUser>
+                                        <AvatarCustom size={24} name={item?.user_name} src={item?.avatar} />
+                                        <p>{item?.user_name}</p>
+                                    </OpionSelectUser>
+                                </Option>
+                            )
+                        })}
                     </Select>
                 </Form.Item>
                 <Form.Item>
                     <Space>
-                        <Button type="primary" htmlType="submit">
+                        <Button loading={isCreateProject} type="primary" htmlType="submit">
                             Create
                         </Button>
                         <Button htmlType="button" onClick={handleCancel}>
@@ -201,12 +275,38 @@ function Home() {
     }
 
     const onRowTable = (record, index) => {
-        history.push('/project/1')
+        history.push(`/project/${record.id}`);
     }
 
     const onClick = async (_record, event) => {
-
+        setRecordOption(_record);
     }
+
+    const onConfirmDelete = async () => {
+        const res = await dispatch(deleteProject([recordOption.id]))
+        if (res.status === 200) {
+            createNotification('success', 'Delete project successfully!')
+        } else {
+            createNotification('error', 'Delete project error!')
+        }
+    }
+
+    const items = [
+        {
+            key: 'project_setting',
+            label: <p>Project settings</p>,
+        },
+        {
+            key: 'move_to_trash',
+            label: <Popconfirm
+                title="Delete the task"
+                description="Are you sure to delete this task?"
+                okText="Yes"
+                cancelText="No"
+                onConfirm={onConfirmDelete}
+            ><p>Move to trash</p></Popconfirm>,
+        },
+    ];
 
     const columns = [
         {
@@ -216,7 +316,11 @@ function Home() {
             width: 60,
             render: (_, record) => {
                 const { is_favorite } = record;
-                return is_favorite ? <FaStar fontSize={20} color={'#637381'} /> : <FaRegStar fontSize={20} color={'#637381'} />
+                return (
+                    <BoxStar onClick={(e) => onChangeFavorite(e, record)}>
+                        {is_favorite ? <FaStar fontSize={20} color={'#637381'} /> : <FaRegStar fontSize={20} color={'#637381'} />}
+                    </BoxStar>
+                )
             },
             sorter: (a, b) => a.is_favorite - b.is_favorite,
         },
@@ -224,7 +328,15 @@ function Home() {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
-            render: (_, record) => <p>{record.name}</p>,
+            render: (_, record) => {
+                const { icon, name } = record;
+                return (
+                    <ProjectName>
+                        <AvatarCustom size={24} type={'square'} name={name} src={icon}/>
+                        <p>{record.name}</p>
+                    </ProjectName>
+                )
+            },
             sorter: (a, b) => a.name.localeCompare(b.name),
 
         },
@@ -239,15 +351,22 @@ function Home() {
             title: 'Type',
             dataIndex: 'type',
             key: 'type',
-            render: (_, record) => <p>{record.type}</p>,
-            sorter: (a, b) => a.type.localeCompare(b.type),
+            render: (_, record) => <p>{record.project_type_name}</p>,
+            sorter: (a, b) => a.project_type_name.localeCompare(b.project_type_name),
         },
         {
             title: 'Lead',
             dataIndex: 'lead',
             key: 'lead',
-            render: (_, record) => <p>{record.lead}</p>,
-            sorter: (a, b) => a.lead.localeCompare(b.lead),
+            render: (_, record) => {
+                return (
+                    <ProjectName>
+                        <AvatarCustom size={24} src={record.user_avatar} name={record.user_name} />
+                        <p>{record.user_name}</p>
+                    </ProjectName>
+                )
+            },
+            sorter: (a, b) => a.user_name.localeCompare(b.user_name),
         },
         {
             title: 'More actions',
@@ -283,6 +402,10 @@ function Home() {
         },
     ];
 
+    const onChangeSearch = (e) => {
+        setQuery({search: e.target.value});
+    }
+
     return (
         <>
             <ContentLayoutWrapper>
@@ -292,28 +415,34 @@ function Home() {
                         <Button onClick={showModal} type={"primary"}>Create project</Button>
                     </div>
                     <div className={'searchsWrapper'}>
-                        <Input placeholder="Search projects" suffix={<MdOutlineSearch fontSize={20} color={'#637381'} />}/>
-                        <Select
-                            mode="multiple"
-                            suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}
-                            placeholder="select one country"
-                            defaultValue={['china']}
-                            // onChange={handleChange}
-                            options={options}
-                            optionRender={(option) => (
-                                <Space>
-                                <span role="img" aria-label={option.data.label}>
-                                  {option.data.emoji}
-                                </span>
-                                    {option.data.desc}
-                                </Space>
-                            )}
+                        <Input
+                            value={query.search}
+                            placeholder="Search projects"
+                            suffix={<MdOutlineSearch fontSize={20} color={'#637381'} />}
+                            onChange={onChangeSearch}
                         />
+                        {/*<Select*/}
+                        {/*    mode="multiple"*/}
+                        {/*    suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}*/}
+                        {/*    placeholder="select one country"*/}
+                        {/*    defaultValue={['china']}*/}
+                        {/*    // onChange={handleChange}*/}
+                        {/*    options={options}*/}
+                        {/*    optionRender={(option) => (*/}
+                        {/*        <Space>*/}
+                        {/*        <span role="img" aria-label={option.data.label}>*/}
+                        {/*          {option.data.emoji}*/}
+                        {/*        </span>*/}
+                        {/*            {option.data.desc}*/}
+                        {/*        </Space>*/}
+                        {/*    )}*/}
+                        {/*/>*/}
                     </div>
                     <Table
+                        loading={isGetProjects}
                         size={"small"}
                         columns={columns}
-                        dataSource={data}
+                        dataSource={projects}
                         onRow={(record, index) => {
                             return {
                                 onClick: () => onRowTable(record, index)
