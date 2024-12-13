@@ -23,6 +23,9 @@ function user(state = {}, action) {
                 ...state,
                 ..._user,
             }
+        case AuthTypes.LOGOUT_SUCCESS:
+            AuthFunction.logout();
+            return state;
         default:
             return state;
     }

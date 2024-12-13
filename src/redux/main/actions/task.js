@@ -9,6 +9,14 @@ export function getTasks(sprintId) {
     }
 }
 
+export function searchTasks(params) {
+    return {
+        types: [TaskTypes.SEARCH_TASKS_REQUEST, TaskTypes.SEARCH_TASKS_SUCCESS, TaskTypes.SEARCH_TASKS_FAIL],
+        callAPI: () => TaskAPI.searchTasks(params),
+        payload: {},
+    }
+}
+
 export function getTask(id) {
     return {
         types: [TaskTypes.GET_TASK_REQUEST, TaskTypes.GET_TASK_SUCCESS, TaskTypes.GET_TASK_FAIL],

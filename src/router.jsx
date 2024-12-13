@@ -18,6 +18,16 @@ const publicRoutes = [
         component: lazy(() => import('../src/pages/Login')),
         exact: true,
     },
+    {
+        path: '/change-password',
+        component: lazy(() => import('../src/pages/ChangePassword')),
+        exact: true,
+    },
+    {
+        path: '/forgot-password',
+        component: lazy(() => import('./pages/ForgotPassword')),
+        exact: true,
+    },
 ]
 
 function PrivateRoute({ children, ...rest }) {

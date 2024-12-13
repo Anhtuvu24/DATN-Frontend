@@ -9,6 +9,14 @@ export function login(gmail, password) {
     }
 }
 
+export function logout() {
+    return {
+        types: [AuthTypes.LOGOUT_REQUEST, AuthTypes.LOGOUT_SUCCESS, AuthTypes.LOGOUT_FAIL],
+        callAPI: () => AuthAPI.logout(),
+        payload: {},
+    }
+}
+
 export function getMe() {
     return {
         types: [AuthTypes.GET_ME_REQUEST, AuthTypes.GET_ME_SUCCESS, AuthTypes.GET_ME_FAIL],

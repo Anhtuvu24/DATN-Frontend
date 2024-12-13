@@ -52,6 +52,9 @@ export const DetailsWrapper = styled.div`
             .sprintName {
               text-transform: capitalize;
             }
+            .priorityOption {
+              width: 120px !important;
+            }
             .ant-select {
               flex: 1;
               max-width: 100%;
@@ -112,4 +115,10 @@ export const SelectOptionItem = styled.div`
     overflow: hidden;
     text-overflow: ellipsis;
   }
+`
+
+export const PriorityOption = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 `

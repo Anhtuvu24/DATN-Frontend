@@ -1,39 +1,43 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { Form, Input, Button } from "antd";
 import { useDispatch } from "react-redux";
+import { useLocation, useHistory } from "react-router-dom";
 
 // Actions
-import {login} from "../../redux/main/actions/auth.js";
+import {changePassword, forgotPassword} from "../../redux/main/actions/user.js";
 
 // Components
 import MainLayout from "../../components/MainLayout/index.jsx";
 
 // Images
-import banner from '../../assets/images/LoginBanner1.png'
-import cvsLogo from '../../assets/images/logo-cvs.svg'
+import banner from '../../assets/images/LoginBanner1.png';
+import cvsLogo from '../../assets/images/logo-cvs.svg';
 
 // Styles
 import { LoginWrapper } from "./local.styles";
 
 // utils
 import createNotification from '../../utils/notificationHelper.js';
-import {useHistory} from "react-router-dom";
 
-function Login() {
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+}
+
+function ForgotPassword() {
     const dispatch = useDispatch();
     const history = useHistory();
-    const [isLoadingLogin, setIsLoadingLogin] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const onFinish = async (values) => {
-        setIsLoadingLogin(true);
-        const { email, password } = values;
-        const res = await dispatch(login(email, password));
+        setIsLoading(true);
+        const { gmail } = values;
+        const res = await dispatch(forgotPassword(gmail));
         if (res?.status === 200 || res?.status === 201) {
-            setIsLoadingLogin(false);
-            createNotification('success', 'Login success');
-            history.push('/home');
+            setIsLoading(false);
+            createNotification('success', 'Check your gmail to reset password');
+            history.push('/login');
         } else {
-            setIsLoadingLogin(false);
+            setIsLoading(false);
             createNotification('error', res.error);
         }
     };
@@ -41,9 +45,11 @@ function Login() {
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
-    const onClickForgot = () => {
-        history.push('/forgot-password')
+
+    const onClickLogin = () => {
+        history.push('/login');
     }
+
     return (
         <>
             <MainLayout>
@@ -54,10 +60,9 @@ function Login() {
                         </div>
                     </div>
                     <div className={'formLogin'}>
-                        <img width={300} src={cvsLogo} alt={'cvs-logo'}/>
+                        <img width={300} src={cvsLogo} alt={'cvs-logo'} />
                         <div className={'loginTitle'}>
-                            <h3>Login CVS-TM</h3>
-                            <p>Please enter login details below</p>
+                            <h3>Reset password</h3>
                         </div>
                         <Form
                             name="basic"
@@ -80,39 +85,26 @@ function Login() {
                             autoComplete="off"
                         >
                             <Form.Item
-                                label="Email"
-                                name="email"
+                                label="Gmail"
+                                name="gmail"
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Please input your Email!',
+                                        message: 'Please input your new password!',
                                     },
                                 ]}
                             >
-                                <Input type={'email'} placeholder={'Enter Email'} />
-                            </Form.Item>
-
-                            <Form.Item
-                                label="Password"
-                                name="password"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input your password!',
-                                    },
-                                ]}
-                            >
-                                <Input.Password placeholder={'Enter password'} />
+                                <Input type={'email'} placeholder={'Enter your email'} />
                             </Form.Item>
 
                             <Form.Item label={null}>
-                                <Button loading={isLoadingLogin} type="primary" htmlType="submit">
-                                    Login
+                                <Button loading={isLoading} type="primary" htmlType="submit">
+                                    Reset password
                                 </Button>
                             </Form.Item>
                             <Form.Item label={null}>
-                                <Button onClick={onClickForgot} disabled={isLoadingLogin} type="text">
-                                    Forgot password
+                                <Button onClick={onClickLogin}>
+                                    Login
                                 </Button>
                             </Form.Item>
                         </Form>
@@ -123,4 +115,4 @@ function Login() {
     );
 }
 
-export default React.memo(Login)
+export default React.memo(ForgotPassword);

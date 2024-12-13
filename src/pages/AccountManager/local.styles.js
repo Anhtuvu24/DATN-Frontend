@@ -1,5 +1,7 @@
 import styled from "styled-components";
-import { Form } from "antd";
+import { Form, Select } from "antd";
+
+const { Option } = Select;
 
 export const AccountsManagerWrapper = styled.div`
   padding: 22px 40px 0;
@@ -59,4 +61,13 @@ export const FormWrapper = styled(Form)`
     justify-content: center;
     height: 102px;
   }
+`
+
+export const SelectRole = styled(Select)`
+    .ant-select-selector {
+      width: 120px !important;
+      .ant-select-selection-item {
+        text-transform: capitalize;
+      }
+    }
 `

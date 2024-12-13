@@ -8,3 +8,35 @@ export function getUsers(page, limit) {
         payload: {},
     }
 }
+
+export function changePassword(userId, currentPassword, newPassword) {
+    return {
+        types: [UserTypes.CHANGE_PASSWORD_REQUEST, UserTypes.CHANGE_PASSWORD_SUCCESS, UserTypes.CHANGE_PASSWORD_FAIL],
+        callAPI: () => UserAPI.changePassword(userId, currentPassword, newPassword),
+        payload: {},
+    }
+}
+
+export function forgotPassword(gmail) {
+    return {
+        types: [UserTypes.FORGOT_PASSWORD_REQUEST, UserTypes.FORGOT_PASSWORD_SUCCESS, UserTypes.FORGOT_PASSWORD_FAIL],
+        callAPI: () => UserAPI.forgotPassword(gmail),
+        payload: {},
+    }
+}
+
+export function updateUser(id, data) {
+    return {
+        types: [UserTypes.UPDATE_USER_REQUEST, UserTypes.UPDATE_USER_SUCCESS, UserTypes.UPDATE_USER_FAIL],
+        callAPI: () => UserAPI.updateUser(id, data),
+        payload: {}
+    }
+}
+
+export function createUser(data) {
+    return {
+        types: [UserTypes.CREATE_USER_REQUEST, UserTypes.CREATE_USER_SUCCESS, UserTypes.CREATE_USER_FAIL],
+        callAPI: () => UserAPI.createUser(data),
+        payload: {}
+    }
+}

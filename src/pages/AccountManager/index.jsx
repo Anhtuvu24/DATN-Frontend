@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Button,
     Input,
@@ -20,9 +20,12 @@ import { FaStar, FaRegStar  } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
 
 // Styles
-import { AccountsManagerWrapper, MoreOption, FormWrapper } from './local.styles';
+import {AccountsManagerWrapper, MoreOption, FormWrapper, SelectRole} from './local.styles';
 import {ContentLayoutWrapper} from "../../components/MainLayout/local.styles.js";
 import {useHistory} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {createUser, getUsers, updateUser} from "../../redux/main/actions/user.js";
+import createNotification from "../../utils/notificationHelper.js";
 
 const options = [
     {
@@ -36,31 +39,13 @@ const options = [
 ];
 const items = [
     {
+        key: 'edit',
+        label: 'Edit user',
+    },
+    {
         key: 'move_to_trash',
         label: 'Move to trash',
-    },
-];
-
-const data = [
-    {
-        is_active: true,
-        name: 'Business Analysis-1',
-        gmail: 'BA-1@gmail.com',
-        role: 'Admin',
-    },
-
-    {
-        is_active: false,
-        name: 'Business Analysis',
-        gmail: 'BA@gmail.com',
-        role: 'Employee',
-    },
-    {
-        is_active: true,
-        name: 'Business Analysis-2',
-        gmail: 'BA-2@gmail.com',
-        role: 'Manager',
-    },
+    }
 ];
 
 const itemsBreadcrumb = [
@@ -84,10 +69,26 @@ const normFile = (e) => {
 };
 
 function AccountsManager() {
+    const dispatch = useDispatch();
     const history = useHistory();
+    const [isLoadingCreate, setIsLoadingCreate] = useState(false);
+    const [isGetUserLoading, setIsGetUserLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
+    const users = useSelector(state => state.main.entities.user.users) || [];
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            setIsGetUserLoading(true);
+            const res = await dispatch(getUsers(1, 100));
+            if (res.status !== 200) {
+                createNotification('error', 'An error occurred');
+            }
+        }
+        fetchUsers();
+        setIsGetUserLoading(false)
+    }, [])
 
     const onClickBreadcrumb = (path) => {
         history.push(path);
@@ -101,7 +102,16 @@ function AccountsManager() {
     const showModal = () => {
         setIsModalOpen(true);
     };
-    const handleOk = (values) => {
+    const handleOk = async (values) => {
+        setIsLoadingCreate(true);
+        const { userName, gmail, role } = values;
+        const res = await dispatch(createUser({ user_name: userName, gmail, role }));
+        if (res.status === 200 || res.status === 201) {
+            createNotification('success', 'Created user success');
+        } else {
+            createNotification('error', res.error);
+        }
+        setIsLoadingCreate(false);
         setIsModalOpen(false);
         form.resetFields();
     };
@@ -130,10 +140,7 @@ function AccountsManager() {
                         },
                     ]}
                 >
-                    <Input placeholder={'Gmail'} />
-                </Form.Item>
-                <Form.Item name='description'>
-                    <Input.TextArea placeholder={'Description'} />
+                    <Input type={'email'} placeholder={'Gmail'} />
                 </Form.Item>
                 <Form.Item
                     name="role"
@@ -149,14 +156,14 @@ function AccountsManager() {
                         allowClear
                         suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}
                     >
-                        <Option value="Admin">Admin</Option>
-                        <Option value="Manager">Manager</Option>
-                        <Option value="Employee">Employee</Option>
+                        <Option value="admin">Admin</Option>
+                        <Option value="manager">Manager</Option>
+                        <Option value="employee">Employee</Option>
                     </Select>
                 </Form.Item>
                 <Form.Item>
                     <Space>
-                        <Button type="primary" htmlType="submit">
+                        <Button loading={isLoadingCreate} type="primary" htmlType="submit">
                             Create
                         </Button>
                         <Button htmlType="button" onClick={handleCancel}>
@@ -172,13 +179,27 @@ function AccountsManager() {
 
     }
 
+    const onChangeRole = async (id, value) => {
+        const res = await dispatch(updateUser(id, { role: value }));
+        if (res.status !== 200) {
+            createNotification('error', 'An error occurred');
+        }
+    }
+
+    const onChangeActive = async (id, value) => {
+        const res = await dispatch(updateUser(id, { is_active: value }));
+        if (res.status !== 200) {
+            createNotification('error', 'An error occurred');
+        }
+    }
+
     const columns = [
         {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
-            render: (_, record) => <p>{record.name}</p>,
-            sorter: (a, b) => a.name.localeCompare(b.name),
+            render: (_, record) => <p>{record.user_name}</p>,
+            sorter: (a, b) => a.name.localeCompare(b.user_name),
 
         },
         {
@@ -192,14 +213,23 @@ function AccountsManager() {
             title: 'Role',
             dataIndex: 'role',
             key: 'role',
-            render: (_, record) => <p>{record.role}</p>,
+            render: (_, record) => <SelectRole
+                placeholder="Select a role"
+                defaultValue={record.role}
+                onChange={(value, option) => onChangeRole(record.id, value)}
+                suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}
+            >
+                <Option value="admin">Admin</Option>
+                <Option value="manager">Manager</Option>
+                <Option value="employee">Employee</Option>
+            </SelectRole>,
             sorter: (a, b) => a.role.localeCompare(b.role),
         },
         {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
-            render: (_, record) => <Switch checked={record.is_active} />,
+            render: (_, record) => <Switch checked={record.is_active} onChange={(value, e) => onChangeActive(record.id, value)} />,
             sorter: (a, b) => a.is_active - b.is_active,
         },
         {
@@ -269,7 +299,8 @@ function AccountsManager() {
                     <Table
                         size={"small"}
                         columns={columns}
-                        dataSource={data}
+                        dataSource={users}
+                        loading={isGetUserLoading}
                         showSorterTooltip={{
                             target: 'sorter-icon',
                         }}

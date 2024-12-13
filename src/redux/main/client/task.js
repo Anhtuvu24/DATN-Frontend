@@ -7,6 +7,17 @@ const TaskAPI = {
             url: `/task/tasks/${sprintId}`,
         })
     },
+    searchTasks: function (params) {
+        return axiosInstance.request({
+            method: 'GET',
+            url: `/task/search-tasks`,
+            params: {
+                limit: 10,
+                page: 1,
+                ...params,
+            },
+        })
+    },
     getTask: function (id) {
         return axiosInstance.request({
             method: 'GET',

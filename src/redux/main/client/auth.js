@@ -13,6 +13,12 @@ const AuthAPI = {
             data: formData,
         })
     },
+    logout: function () {
+        return axiosInstance.request({
+            method: 'POST',
+            url: '/users/logout',
+        })
+    },
     getMe: function () {
         return axiosInstance.request({
             method: 'GET',

@@ -7,7 +7,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 dayjs.extend(customParseFormat);
 // Styles
-import { DetailsWrapper, LabelStatusItem, SelectOptionItem } from "./local.styles.js";
+import {DetailsWrapper, LabelStatusItem, PriorityOption, SelectOptionItem} from "./local.styles.js";
 
 // Utils
 import {timeAgo} from "../../utils/helper.js";
@@ -15,9 +15,25 @@ import AvatarCustom from "../AvatarCustom/index.jsx";
 import {updateTask} from "../../redux/main/actions/task.js";
 import {useParams} from "react-router-dom";
 import createNotification from "../../utils/notificationHelper.js";
+import Priority from "../Priority";
 
 const { Panel } = Collapse;
 const { Option } = Select;
+
+const priorityOption = [
+    {
+        value: 'low',
+        label: <PriorityOption><Priority type={'low'} />Low</PriorityOption>
+    },
+    {
+        value: 'medium',
+        label: <PriorityOption><Priority type={'medium'} />Medium</PriorityOption>
+    },
+    {
+        value: 'high',
+        label: <PriorityOption><Priority type={'high'} />High</PriorityOption>
+    },
+]
 
 function TaskInforDetail({ loading }) {
     const dispatch = useDispatch();
@@ -86,6 +102,13 @@ function TaskInforDetail({ loading }) {
         }
     }
 
+    const onChangePriority = async (value) => {
+        const res = await dispatch(updateTask(taskId, { priority: value }));
+        if (res.status !== 200) {
+            createNotification('error', 'Changed assignee fail');
+        }
+    }
+
     return (
         <DetailsWrapper color={colorItem.color} bgColor={colorItem.bgColor}>
             {loading ? (
@@ -143,6 +166,22 @@ function TaskInforDetail({ loading }) {
                                 <Skeleton.Button active={true} />
                             ) : (
                                 <p className={'sprintName'}>{sprint.name}</p>
+                            )}
+                        </div>
+                    </div>
+                    <div className={'detailItem'}>
+                        <p>Priority</p>
+                        <div>
+                            {loading ? (
+                                <Skeleton.Button active={true} />
+                            ) : (
+                                <Select
+                                    defaultValue={priority}
+                                    onChange={onChangePriority}
+                                    options={priorityOption}
+                                    getPopupContainer={trigger => trigger}
+                                    popupClassName={'priorityOption'}
+                                />
                             )}
                         </div>
                     </div>

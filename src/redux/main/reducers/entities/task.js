@@ -192,8 +192,18 @@ function currentTask(state = {}, action) {
     }
 }
 
+function searchTasks(state= {}, action) {
+    switch (action.type) {
+        case TaskTypes.SEARCH_TASKS_SUCCESS:
+            return action.data;
+        default:
+            return state;
+    }
+}
+
 export default combineReducers({
     tasks,
     all,
-    currentTask
+    currentTask,
+    searchTasks
 })

@@ -14,7 +14,7 @@ const getToken = () => {
 
 const logout = () => {
   localStorage.removeItem('token')
-  localStorage.removeItem('role')
+  localStorage.removeItem('refreshToken')
 }
 
 const login = user => {

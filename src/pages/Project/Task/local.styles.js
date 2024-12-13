@@ -14,12 +14,13 @@ export const TaskWrapper = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 26px;
+    min-height: 26px;
     .optionTask {
       display: none;
     }
     .title {
       flex: 1;
+      padding-right: 8px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
