@@ -10,7 +10,8 @@ import { parse, stringify } from 'query-string'
 // Components
 import Loader from './components/loader'
 import ErrorBoundary from './ErrorBoundary'
-const PrivateScreen = lazy(() => import('./pages/PrivateScreens/index.jsx'))
+const PrivateScreen = lazy(() => import('./pages/PrivateScreens/index.jsx'));
+const Page404 = lazy(() => import('./pages/404.jsx'));
 
 const publicRoutes = [
     {
@@ -66,7 +67,7 @@ export default function Routes() {
                             <PrivateRoute path='/'>
                                 <PrivateScreen />
                             </PrivateRoute>
-                            {/*<Route component={Page404} />*/}
+                            <Route component={Page404} />
                         </Switch>
                     </QueryParamProvider>
                 </Router>

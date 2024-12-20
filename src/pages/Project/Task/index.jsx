@@ -17,7 +17,7 @@ import {useHistory, useParams} from "react-router-dom";
 
 
 
-function Task({ id, index, task }) {
+function Task({ id, index, task, isHidden }) {
     if (!task) return null
     const params = useParams();
     const projectId = params.id;
@@ -63,6 +63,7 @@ function Task({ id, index, task }) {
         >
             {provided => (
                 <TaskWrapper
+                    isHidden={isHidden}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     ref={provided.innerRef}

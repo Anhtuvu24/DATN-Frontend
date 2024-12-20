@@ -55,6 +55,7 @@ function Home() {
     const dispatch = useDispatch();
     const history = useHistory();
 
+    const me = useSelector(state => state.main.entities.auth.user) || {};
     const users = useSelector(state => state.main.entities.user.users) || [];
     const projects = useSelector(state => state.main.entities.project?.projects?.data) || [];
     const projectTypes = useSelector(state => state.main.entities.project_type?.project_types?.data) || [];
@@ -291,39 +292,45 @@ function Home() {
         }
     }
 
-    const items = [
-        {
-            key: 'project_setting',
-            label: <p>Project settings</p>,
-        },
-        {
-            key: 'move_to_trash',
-            label: <Popconfirm
-                title="Delete the task"
-                description="Are you sure to delete this task?"
-                okText="Yes"
-                cancelText="No"
-                onConfirm={onConfirmDelete}
-            ><p>Move to trash</p></Popconfirm>,
-        },
-    ];
+    const items = (isDisable) => {
+        return(
+            [
+                {
+                    key: 'project_setting',
+                    label: <p>Project settings</p>,
+                    disabled: isDisable
+                },
+                {
+                    key: 'move_to_trash',
+                    label: <Popconfirm
+                        title="Delete the task"
+                        description="Are you sure to delete this task?"
+                        okText="Yes"
+                        cancelText="No"
+                        onConfirm={onConfirmDelete}
+                    ><p>Move to trash</p></Popconfirm>,
+                    disabled: isDisable
+                },
+            ]
+        )
+    };
 
     const columns = [
-        {
-            title: <FaStar fontSize={18} color={'#637381'} />,
-            dataIndex: 'is_favorite',
-            key: 'is_favorite',
-            width: 60,
-            render: (_, record) => {
-                const { is_favorite } = record;
-                return (
-                    <BoxStar onClick={(e) => onChangeFavorite(e, record)}>
-                        {is_favorite ? <FaStar fontSize={20} color={'#637381'} /> : <FaRegStar fontSize={20} color={'#637381'} />}
-                    </BoxStar>
-                )
-            },
-            sorter: (a, b) => a.is_favorite - b.is_favorite,
-        },
+        // {
+        //     title: <FaStar fontSize={18} color={'#637381'} />,
+        //     dataIndex: 'is_favorite',
+        //     key: 'is_favorite',
+        //     width: 60,
+        //     render: (_, record) => {
+        //         const { is_favorite } = record;
+        //         return (
+        //             <BoxStar onClick={(e) => onChangeFavorite(e, record)}>
+        //                 {is_favorite ? <FaStar fontSize={20} color={'#637381'} /> : <FaRegStar fontSize={20} color={'#637381'} />}
+        //             </BoxStar>
+        //         )
+        //     },
+        //     sorter: (a, b) => a.is_favorite - b.is_favorite,
+        // },
         {
             title: 'Name',
             dataIndex: 'name',
@@ -359,6 +366,7 @@ function Home() {
             dataIndex: 'lead',
             key: 'lead',
             render: (_, record) => {
+                if (!record.user_name) return null
                 return (
                     <ProjectName>
                         <AvatarCustom size={24} src={record.user_avatar} name={record.user_name} />
@@ -378,7 +386,7 @@ function Home() {
                 return (
                     <div onClick={(e) => e.stopPropagation()}>
                         <Popover
-                            content={<Menu items={items} onClick={(e) => {
+                            content={<Menu items={items(!(me.role === 'admin' || me.role === 'manager' || me.id === record.id_type))} onClick={(e) => {
                                 onClick(record, e)
                             }} selectedKeys={[]}/>}
                             arrow={false}

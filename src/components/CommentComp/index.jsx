@@ -13,7 +13,7 @@ import createNotification from "../../utils/notificationHelper.js";
 
 const { getMentions } = Mentions;
 
-function CommentComp({ item }) {
+function CommentComp({ item, isCommentSelect }) {
     const dispatch = useDispatch();
     const { id, text, created_at, updated_at, user } = item;
     const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
@@ -86,7 +86,7 @@ function CommentComp({ item }) {
     }
 
     return (
-        <CommentItemWrapper>
+        <CommentItemWrapper isCommentSelect={isCommentSelect}>
             <div className={'blockAvatar'}>
                 <AvatarCustom size={32} src={user?.avatar || ''} name={user?.user_name || ''} />
             </div>

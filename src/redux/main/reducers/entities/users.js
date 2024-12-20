@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import {UserTypes} from "../../action_types/index.js";
+import {AuthTypes, UserTypes} from "../../action_types/index.js";
 import {arrayToObject} from "../../../../utils/helper.js";
 
 function all(state = {}, action) {
@@ -23,6 +23,18 @@ function all(state = {}, action) {
                 ...state,
                 [user_created.id]: user_created
             };
+        case AuthTypes.UPLOAD_AVATAR_SUCCESS:
+            const { user: userUpload } = action.data;
+            return {
+                ...state,
+                [userUpload.id]: userUpload
+            }
+        case AuthTypes.UPDATE_ME_SUCCESS:
+            const { user: userUpdate } = action.data;
+            return {
+                ...state,
+                [userUpdate.id]: userUpdate
+            }
         default:
             return state;
     }
@@ -45,6 +57,24 @@ function users(state = [], action) {
         case UserTypes.CREATE_USER_SUCCESS:
             const { user: user_created } = action.data;
             return [...state, user_created];
+        case AuthTypes.UPLOAD_AVATAR_SUCCESS:
+            const { user: userUpload } = action.data;
+            const newUsers1 = state.map(item => {
+                if (item.id === userUpload.id) {
+                    return userUpload;
+                }
+                return item;
+            })
+            return newUsers1;
+        case AuthTypes.UPDATE_ME_SUCCESS:
+            const { user: userUpdate } = action.data;
+            const newUsers2 = state.map(item => {
+                if (item.id === userUpdate.id) {
+                    return userUpdate;
+                }
+                return item;
+            })
+            return newUsers2;
         default:
             return state;
     }

@@ -20,7 +20,7 @@ function statuses(state = [], action) {
     switch (action.type) {
         case StatusTypes.GET_STATUSES_SUCCESS:
             const { data } = action.data;
-            return [...state, ...data]
+            return data
         default:
             return state;
     }

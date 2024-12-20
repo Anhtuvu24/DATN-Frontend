@@ -3,6 +3,9 @@ import styled from "styled-components";
 export const CommentItemWrapper = styled.div`
   display: flex;
   gap: 12px;
+  background-color: ${props => props.isCommentSelect ? '#F1F2F4' : 'unset'};
+  padding: 8px;
+  border-radius: 8px;
   .commentWrapper {
     width: 100%;
     .headerComment {

@@ -1,4 +1,5 @@
 import axiosInstance from './axiosConfig'
+import {createCancelToken} from "./axiosUtils.js";
 
 const AuthAPI = {
     login: function (gmail, password) {
@@ -23,8 +24,27 @@ const AuthAPI = {
         return axiosInstance.request({
             method: 'GET',
             url: `/users/me`,
+            cancelToken: cancelTokenObject[this.getMe.name].requestCancellation().token,
+        })
+    },
+    uploadAvatar: function (id, file) {
+        let formData = new FormData();
+        formData.append('avatar', file)
+        formData.append('userId', id)
+        return axiosInstance.request({
+            method: 'POST',
+            url: '/users/upload-avatar',
+            data: formData,
+        })
+    },
+    updateMe: function (id, data) {
+        return axiosInstance.request({
+            method: 'PUT',
+            url: `/users/update-user/${id}`,
+            data
         })
     }
 }
 
+const cancelTokenObject = createCancelToken(AuthAPI);
 export default AuthAPI;

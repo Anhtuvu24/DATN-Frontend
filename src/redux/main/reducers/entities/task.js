@@ -64,43 +64,6 @@ function tasks(state = {}, action) {
             const { id: taskId, id_status: newStatusId, index: newIndex } = updated_task;
 
             const sprintIdForUpdate = sprint_id;
-
-            // Lấy danh sách tasks_by_status của sprint
-            // const currentTasksByStatusForUpdate = state[sprintIdForUpdate] || [];
-            //
-            // // Cập nhật lại tasks_by_status sau khi di chuyển task
-            // const updatedTasksByStatusForUpdate = currentTasksByStatusForUpdate.map((status) => {
-            //     if (status.id === newStatusId) {
-            //         // Lọc task cũ ra khỏi danh sách
-            //         const taskToMove = status.tasks.find(task => task.id === taskId);
-            //         const otherTasks = status.tasks.filter(task => task.id !== taskId);
-            //
-            //         // Di chuyển task vào vị trí mới
-            //         const updatedTasks = [...otherTasks];
-            //         updatedTasks.splice(newIndex, 0, {
-            //             ...currentTask, // Giữ lại tất cả thông tin của task
-            //             index: newIndex, // Cập nhật lại index mới
-            //         });
-            //
-            //         return {
-            //             ...status,
-            //             tasks: updatedTasks, // Cập nhật lại tasks
-            //         };
-            //     }
-            //     if (status.id === lastStatusId) {
-            //         const otherTasks = status.tasks.filter(task => task.id !== taskId);
-            //         return {
-            //             ...status,
-            //             tasks: otherTasks
-            //         }
-            //     }
-            //     return status;
-            // });
-            //
-            // return {
-            //     ...state,
-            //     [sprintIdForUpdate]: updatedTasksByStatusForUpdate,
-            // };
             const updatedTasksByStatusForUpdate = state[sprintIdForUpdate].map((status) => {
                 if (_updatedTasksByStatus[status.id]) {
                     return {

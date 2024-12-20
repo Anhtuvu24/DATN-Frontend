@@ -8,18 +8,13 @@ const Page404 = lazy(() => import('../404.jsx'));
 
 const privateRoutes = [
     {
-        path: 'project/:id',
-        component: lazy(() => import('../Project')),
-        exact: true,
-    },
-    {
-        path: 'project/:idProject/task/:id',
-        component: lazy(() => import('../TaskDetail')),
+        path: '/account',
+        component: lazy(() => import('../AccountManager')),
         exact: true,
     },
 ]
 
-function DashboardRoutes() {
+function AdminDashboardRoutes() {
     const { url } = useRouteMatch();
     return (
         <Suspense fallback={Loader}>
@@ -29,13 +24,10 @@ function DashboardRoutes() {
                         <route.component />
                     </Route>
                 ))}
-                {/*<Route path={'/'}>*/}
-                {/*    <Redirect to={'home'} />*/}
-                {/*</Route>*/}
                 <Route  component={Page404} />
             </Switch>
         </Suspense>
     );
 };
 
-export default DashboardRoutes;
+export default AdminDashboardRoutes;

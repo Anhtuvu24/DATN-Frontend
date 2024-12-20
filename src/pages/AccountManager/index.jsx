@@ -36,6 +36,10 @@ const options = [
         label: 'Inactive',
         value: 'inactive',
     },
+    {
+        value: 'all',
+        label: 'All'
+    }
 ];
 const items = [
     {
@@ -78,6 +82,10 @@ function AccountsManager() {
     const [form] = Form.useForm();
     const users = useSelector(state => state.main.entities.user.users) || [];
 
+    const [_users, setUsers] = useState([]);
+    const [searchName, setSearchName] = useState('');
+    const [activeFilter, setActiveFilter] = useState(null);
+
     useEffect(() => {
         const fetchUsers = async () => {
             setIsGetUserLoading(true);
@@ -89,6 +97,25 @@ function AccountsManager() {
         fetchUsers();
         setIsGetUserLoading(false)
     }, [])
+
+
+
+    useEffect(() => {
+        setUsers(users);
+    }, [users])
+
+    useEffect(() => {
+        if (searchName && activeFilter === 'all') {
+            setUsers(users);
+        } else {
+            const newUsers = users.filter((item) => {
+                const isSameNameOrGmail = item.user_name?.includes(searchName) || item.gmail?.includes(searchName);
+                const isSameActive = activeFilter === 'active' ? item.is_active == true : activeFilter === 'inactive' ? item.is_active === false : true;
+                return isSameActive && isSameNameOrGmail
+            })
+            setUsers(newUsers)
+        }
+    }, [searchName, activeFilter])
 
     const onClickBreadcrumb = (path) => {
         history.push(path);
@@ -266,6 +293,15 @@ function AccountsManager() {
         },
     ];
 
+    const changeSearchName = (e) => {
+        const value = e.target.value;
+        setSearchName(value);
+    }
+
+    const onChageSelect = (value) => {
+        setActiveFilter(value)
+    }
+
     return (
         <>
             <ContentLayoutWrapper>
@@ -281,11 +317,18 @@ function AccountsManager() {
                         <Button onClick={showModal} type={"primary"}>Create user</Button>
                     </div>
                     <div className={'searchsWrapper'}>
-                        <Input placeholder="Search users" suffix={<MdOutlineSearch fontSize={20} color={'#637381'} />}/>
+                        <Input
+                            value={searchName}
+                            placeholder="Search users"
+                            suffix={<MdOutlineSearch fontSize={20} color={'#637381'} />}
+                            onChange={changeSearchName}
+                        />
                         <Select
                             suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}
                             placeholder="Status"
-                            // onChange={handleChange}
+                            onChange={onChageSelect}
+                            defaultValue={'all'}
+                            value={activeFilter}
                             options={options}
                             optionRender={(option) => (
                                 <Space>
@@ -299,7 +342,7 @@ function AccountsManager() {
                     <Table
                         size={"small"}
                         columns={columns}
-                        dataSource={users}
+                        dataSource={_users}
                         loading={isGetUserLoading}
                         showSorterTooltip={{
                             target: 'sorter-icon',

@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const TaskWrapper = styled.div`
   background-color: #FFFFFF;
   padding: 8px 12px;
-  display: flex;
+  display: ${props => props.isHidden ? 'none !important' : 'flex'};
   flex-direction: column;
   gap: 16px;
   border-radius: 8px;

@@ -182,3 +182,27 @@ export const EmptySprintWrapper = styled.div`
     margin-top: 16px;
   }
 `
+
+export const StatusesWrapperLoading = styled.div`
+  display: flex;
+  gap: 12px;
+  height: 100%;
+  min-height: 230px;
+  overflow-y: auto;
+`
+
+export const StatusWrapperLoading = styled.div`
+  display: flex;
+  gap: 12px;
+  max-width: 282px;
+  min-width: 282px;
+  height: 100%;
+  .ant-skeleton {
+    width: 100%;
+    height: 100%;
+    .ant-skeleton-button {
+      width: 100%;
+      height: 100%;
+    }
+  }
+`

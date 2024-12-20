@@ -1,4 +1,5 @@
 import axiosInstance from './axiosConfig'
+import {createCancelToken} from "./axiosUtils.js";
 
 const ProjectAPI = {
     getProjects: function (page = 1, limit = 100, search = '') {
@@ -9,7 +10,8 @@ const ProjectAPI = {
                 page,
                 limit,
                 search,
-            }
+            },
+            cancelToken: cancelTokenObject[this.getProjects.name].requestCancellation().token,
         })
     },
     getProject: function (id) {
@@ -56,5 +58,7 @@ const ProjectAPI = {
         })
     },
 }
+
+const cancelTokenObject = createCancelToken(ProjectAPI);
 
 export default ProjectAPI;

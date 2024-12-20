@@ -2,6 +2,8 @@ import actions, { getView } from './actions'
 const initState = {
   view: getView(window.innerWidth),
   height: window.innerHeight,
+  current: 'board',
+  current_admin: 'role_assignment'
 }
 
 export default function appReducer(state = initState, action) {
@@ -17,6 +19,16 @@ export default function appReducer(state = initState, action) {
         }
       }
       break
+    case actions.CHANGE_CURRENT:
+      return {
+        ...state,
+        current: action.key,
+      }
+    case actions.CHANGE_CURRENT_ADMIN:
+      return {
+        ...state,
+        current_admin: action.key,
+      }
     default:
       return state
   }

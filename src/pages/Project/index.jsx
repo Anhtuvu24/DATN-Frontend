@@ -11,7 +11,7 @@ import {
     DatePicker,
     Select,
     Upload,
-    Popconfirm
+    Popconfirm, Skeleton
 } from "antd";
 import { SlOptions } from "react-icons/sl";
 import { MdOutlineSearch, MdUpload } from "react-icons/md";
@@ -26,9 +26,11 @@ import CKEditorCustom from "../../components/CKEditor/index.jsx";
 import {
     EmptySprintWrapper,
     FormCreateTask,
-    FormEditSprint, ListFileWrapper,
+    FormEditSprint,
+    ListFileWrapper,
     ProjectDetailWrapper,
     SelectOptionItem,
+    StatusesWrapperLoading, StatusWrapperLoading,
     UploadAreaWrapper,
     UserItem
 } from './local.styles.js';
@@ -42,8 +44,7 @@ import {completeSprint, createSprint, updateSprint} from "../../redux/main/actio
 import createNotification from "../../utils/notificationHelper.js";
 import {createTask, getTasks, updateOrderTask} from "../../redux/main/actions/task.js";
 import AvatarCustom from "../../components/AvatarCustom/index.jsx";
-
-const users = ['V', 'A', 'T'];
+import Issues from "./Issues/Issues.jsx";
 
 const items = [
     {
@@ -87,6 +88,7 @@ function Project() {
     const params = useParams();
     const projectId = params.id;
 
+    const [isGetProject, setIsGetProject] = useState(false);
     const [isCreateTask, setIsCreateTask] = useState(false);
     const [isGetTasks, setIsGetTasks] = useState(false);
     const [isCompleteSprint, setIsCompleteSprint] = useState(false);
@@ -97,8 +99,9 @@ function Project() {
     const [isModalCreateTaskOpen, setIsModalCreateTaskOpen] = useState(false);
 
     const [record, setRecord] = useState(null);
+    const [nameSearch, setNameSearch] = useState('');
     const [usersSelect, setUsersSelect] = useState([]);
-    // const [categories, setCategories] = useState([])
+    const [_categories, setCategories] = useState([])
     const [fileList, setFileList] = useState([]);
     const [form] = Form.useForm();
     const [formUpdateSprint] = Form.useForm();
@@ -106,6 +109,7 @@ function Project() {
 
     const [isScrolled, setIsScrolled] = useState(false);
 
+    const currentKey = useSelector(state => state.App?.current);
     const me = useSelector(state => state.main.entities.auth.user) || {};
     const users = useSelector(state => state.main.entities.user.users) || [];
     const currentProject = useSelector(state => state.main.entities.project?.currentProject) || {};
@@ -115,12 +119,12 @@ function Project() {
 
     const itemsBreadcrumb = [
         {
-            title: 'Projects',
+            title: isGetProject ? <Skeleton.Button active={true} size={"small"} /> : 'Projects',
             path: '/home'
         },
         {
-            title: currentProject.name,
-            path: `/project/${currentProject.id}`
+            title: isGetProject ? <Skeleton.Button active={true} size={"small"} /> : currentProject?.name,
+            path: `/project/${currentProject?.id}`
         },
     ];
 
@@ -129,7 +133,8 @@ function Project() {
             setIsGetTasks(true);
             const res = await dispatch(getTasks(active_sprints[0].id));
             if (res.status === 200) {
-                // setCategories(res.data.tasks_by_status);
+                const { tasks_by_status } = res.data;
+                setCategories(tasks_by_status);
             } else {
                 createNotification('error', 'Get tasks error!')
             }
@@ -141,7 +146,19 @@ function Project() {
     }, [active_sprints])
 
     useEffect(() => {
-        dispatch(getProject(projectId));
+        setCategories(categories);
+    }, [categories])
+
+    useEffect(() => {
+        const fetchProject = async () => {
+            setIsGetProject(true);
+            const res = await dispatch(getProject(projectId));
+            if (res.status !== 200) {
+                createNotification('error', 'Have an error');
+            }
+            setIsGetProject(false);
+        }
+        fetchProject();
     }, [projectId])
 
     useEffect(() => {
@@ -158,19 +175,21 @@ function Project() {
         }
     }, []);
 
-
-
     const handleChangeUpload = ({ fileList: newFileList }) => {
         setFileList(newFileList);
     };
 
     const onSelect = (item) => {
-        if (usersSelect.includes(item)) {
-            const newArr = usersSelect.filter((i, index) => i !== item)
+        if (usersSelect.includes(item.id)) {
+            const newArr = usersSelect.filter((i, index) => i !== item.id)
             setUsersSelect(newArr)
         } else {
-            setUsersSelect(prev => ([...usersSelect, item]))
+            setUsersSelect(prev => ([...usersSelect, item.id]))
         }
+    }
+
+    const onChangeSearch = (e) => {
+        setNameSearch(e.target.value);
     }
 
     const onClickSettingSprint = ({ item, key }) => {
@@ -482,20 +501,9 @@ function Project() {
                         showUploadList={{ showPreviewIcon: false }}
                         showPreview={false}
                     >
-                        {/*{fileList.length ? (*/}
-                        {/*    <ListFileWrapper>*/}
-                        {/*        {fileList.map((item, index) => {*/}
-                        {/*            return (*/}
-                        {/*                <FileComp file={item} size={'100px'} />*/}
-                        {/*            )*/}
-                        {/*        })}*/}
-                        {/*    </ListFileWrapper>*/}
-                        {/*) : (*/}
-                            <UploadAreaWrapper>
-                                <MdUpload fontSize={20} color={'#637381'} /> Attachments
-                            </UploadAreaWrapper>
-
-                        {/*)}*/}
+                        <UploadAreaWrapper>
+                            <MdUpload fontSize={20} color={'#637381'} /> Attachments
+                        </UploadAreaWrapper>
                     </Upload>
                 </Form.Item>
                 <Form.Item>
@@ -538,24 +546,23 @@ function Project() {
 
             const [movedTask] = sourceTasks.splice(source.index, 1);
 
-            // if (source.droppableId === destination.droppableId) {
-            //     sourceTasks.splice(destination.index, 0, movedTask);
-            //     setCategories(categories.map(cat =>
-            //         cat.id === sourceCategory.id
-            //             ? { ...cat, tasks: sourceTasks }
-            //             : cat
-            //     ));
-            // } else {
-            //     destTasks.splice(destination.index, 0, movedTask);
-            //     setCategories(categories.map(cat =>
-            //         cat.id === sourceCategory.id
-            //             ? { ...cat, tasks: sourceTasks }
-            //             : cat.id === destCategory.id
-            //                 ? { ...cat, tasks: destTasks }
-            //                 : cat
-            //     ));
-            // }
-            // Gọi Redux và backend để đồng bộ
+            if (source.droppableId === destination.droppableId) {
+                sourceTasks.splice(destination.index, 0, movedTask);
+                setCategories(categories.map(cat =>
+                    cat.id === sourceCategory.id
+                        ? { ...cat, tasks: sourceTasks.map((task, index) => ({ ...task, index })) }
+                        : cat
+                ));
+            } else {
+                destTasks.splice(destination.index, 0, movedTask);
+                setCategories(categories.map(cat =>
+                    cat.id === sourceCategory.id
+                        ? { ...cat, tasks: sourceTasks.map((task, index) => ({ ...task, index })) }
+                        : cat.id === destCategory.id
+                            ? { ...cat, tasks: destTasks.map((task, index) => ({ ...task, index })) }
+                            : cat
+                ));
+            }
             const res = await dispatch(updateOrderTask({
                 taskId: movedTask.id,
                 id_status: movedTask.id_status,
@@ -565,6 +572,8 @@ function Project() {
                 destinationStatus: destination.droppableId,
             }));
             if (res.status !== 200) {
+                setCategories(categories);
+                setUsersSelect([]);
                 createNotification('error', 'Change status fail!');
             }
         }
@@ -586,108 +595,144 @@ function Project() {
     }
 
     return (
-        <>
-            <ProjectDetailWrapper>
-                <Breadcrumb>
-                    {itemsBreadcrumb.map(item => {
-                        return (
-                            <Breadcrumb.Item onClick={() => onClickBreadcrumb(item.path)}>{item.title}</Breadcrumb.Item>
-                        )
-                    })}
-                </Breadcrumb>
-                {!active_sprints?.length ? (
-                    <EmptySprintWrapper>
-                        <h1>Empty sprint active</h1>
-                        <p>Create a sprint to start work</p>
-                        <Button type={"primary"} onClick={onClickCreateSprint}>Create sprint</Button>
-                    </EmptySprintWrapper>
-                ) : (
-                    <>
-                        <div className={'sprintHeader'}>
-                            <h1>{currentProject.key} {active_sprints[0]?.name}</h1>
-                            <div className={'sprintOption'}>
-                                <p>End time: {moment(active_sprints[0]?.end_date).format('DD/MM/YYYY')}</p>
-                                <Popconfirm title={'Do you want to complete this sprint?'} onConfirm={onComfirmComplete}>
-                                    <Button loading={isCompleteSprint} type={"primary"}>Complete sprint</Button>
-                                </Popconfirm>
-                                <Dropdown
-                                    menu={{
-                                        items,
-                                        onClick: onClickSettingSprint
-                                    }}
-                                    arrow={false}
-                                    placement="bottomLeft"
-                                    trigger={'click'}
-                                    getPopupContainer={triggerNode => triggerNode}
-                                >
-                                    <Button><SlOptions color={'#637381'} fontSize={20} /></Button>
-                                </Dropdown>
+        currentKey === 'board' ? (
+            <>
+                <ProjectDetailWrapper>
+                    <Breadcrumb>
+                        {itemsBreadcrumb.map(item => {
+                            return (
+                                <Breadcrumb.Item onClick={() => onClickBreadcrumb(item.path)}>{item.title}</Breadcrumb.Item>
+                            )
+                        })}
+                    </Breadcrumb>
+                    {(!isGetProject && !active_sprints?.length) ? (
+                        <EmptySprintWrapper>
+                            <h1>Empty sprint active</h1>
+                            <p>Create a sprint to start work</p>
+                            <Button type={"primary"} onClick={onClickCreateSprint}>Create sprint</Button>
+                        </EmptySprintWrapper>
+                    ) : (
+                        <>
+                            <div className={'sprintHeader'}>
+                                {isGetProject ? (
+                                    <Skeleton.Button active={true} size={40} />
+                                ) : (
+                                    <h1>{currentProject.key} {active_sprints[0]?.name}</h1>
+                                )}
+                                <div className={'sprintOption'}>
+                                    {isGetProject ? (
+                                        <Skeleton.Button active={true} size={"small"} />
+                                    ) : (
+                                        <p>End time: {moment(active_sprints[0]?.end_date).format('DD/MM/YYYY')}</p>
+                                    )}
+                                    <Popconfirm title={'Do you want to complete this sprint?'} onConfirm={onComfirmComplete}>
+                                        <Button disabled={isGetProject} loading={isCompleteSprint} type={"primary"}>Complete sprint</Button>
+                                    </Popconfirm>
+                                    <Dropdown
+                                        menu={{
+                                            items,
+                                            onClick: onClickSettingSprint
+                                        }}
+                                        arrow={false}
+                                        placement="bottomLeft"
+                                        trigger={'click'}
+                                        getPopupContainer={triggerNode => triggerNode}
+                                    >
+                                        <Button><SlOptions color={'#637381'} fontSize={20} /></Button>
+                                    </Dropdown>
+                                </div>
                             </div>
-                        </div>
-                        <div className={'searchAndFilterNav'}>
-                            <Input placeholder="Search" prefix={<MdOutlineSearch fontSize={20} color={'#637381'} />}/>
-                            <div className={'listUser'}>
-                                {users.map((item, index) => {
-                                    return (
-                                        <UserItem key={`user-${index}`} is_select={usersSelect.includes(item) || undefined} onClick={() => onSelect(item)} className={'userItem'}>
-                                            <AvatarCustom size={32} name={item?.user_name} src={item?.avatar} />
-                                        </UserItem>
-                                    )
-                                })}
-                            </div>
-                        </div>
-                        <div className={'TasksWrapper'}>
-                            <StatusesTask isScrolled={isScrolled} />
-                            <DragDropContext onDragEnd={onDragEnd}>
-                                <div className={'tasksContainer'}>
-                                    {categories.map((item, index) => {
-                                        return <Tasks
-                                            tasks={item.tasks}
-                                            id={item.id}
-                                            key={item.id}
-                                            setRecord={setRecord}
-                                            onClickCreateTask={onClickCreateTask}
-                                        />
+                            <div className={'searchAndFilterNav'}>
+                                <Input
+                                    value={nameSearch}
+                                    onChange={onChangeSearch}
+                                    placeholder="Search"
+                                    prefix={<MdOutlineSearch fontSize={20} color={'#637381'} />}
+                                />
+                                <div className={'listUser'}>
+                                    {users.map((item, index) => {
+                                        return (
+                                            <UserItem key={`user-${index}`} is_select={usersSelect.includes(item.id) || undefined} onClick={() => onSelect(item)} className={'userItem'}>
+                                                <AvatarCustom size={32} name={item?.user_name} src={item?.avatar} />
+                                            </UserItem>
+                                        )
                                     })}
                                 </div>
-                            </DragDropContext>
-                        </div>
-                    </>
-                )}
+                            </div>
+                            <div className={'TasksWrapper'}>
+                                {isGetTasks ? (
+                                    <StatusesWrapperLoading>
+                                        {[1, 2, 3, 4].map(item => {
+                                            return (
+                                                <StatusWrapperLoading>
+                                                    <Skeleton.Button active={true} />
+                                                </StatusWrapperLoading>
+                                            )
+                                        })}
+                                    </StatusesWrapperLoading>
+
+                                ) : (
+                                    <>
+                                        <StatusesTask isScrolled={isScrolled} />
+                                        <DragDropContext onDragEnd={onDragEnd}>
+                                            <div className={'tasksContainer'}>
+                                                {_categories.map((item, index) => {
+                                                    return <Tasks
+                                                        tasks={item.tasks}
+                                                        id={item.id}
+                                                        key={item.id}
+                                                        nameSearch={nameSearch}
+                                                        usersSelect={usersSelect}
+                                                        setRecord={setRecord}
+                                                        onClickCreateTask={onClickCreateTask}
+                                                    />
+                                                })}
+                                            </div>
+                                        </DragDropContext>
+                                    </>
+                                )}
+
+                            </div>
+                        </>
+                    )}
 
 
-            </ProjectDetailWrapper>
-            <Modal
-                title={"Edit sprint"}
-                wrapClassName={'modalAddProject'}
-                open={isModalSprintOpen}
-                onCancel={handleCancel}
-                footer={false}
-                getContainer={triggerNode => triggerNode}
-            >
-                {renderContentModalSprint()}
-            </Modal>
-            <Modal
-                title={"Create sprint"}
-                wrapClassName={'modalAddProject'}
-                open={isModalCreateSprintOpen}
-                onCancel={handleCancel}
-                footer={false}
-                getContainer={triggerNode => triggerNode}
-            >
-                {renderContentModalCreateSprint()}
-            </Modal>
-            <Modal
-                title="Create task"
-                wrapClassName={'modalAddTaskmy'}
-                open={isModalCreateTaskOpen}
-                onCancel={handleCancel}
-                footer={false}
-                getContainer={triggerNode => triggerNode}
-            >
-                {renderContentModalCreateTask()}
-            </Modal>
-        </>
+                </ProjectDetailWrapper>
+                <Modal
+                    title={"Edit sprint"}
+                    wrapClassName={'modalAddProject'}
+                    open={isModalSprintOpen}
+                    onCancel={handleCancel}
+                    footer={false}
+                    getContainer={triggerNode => triggerNode}
+                >
+                    {renderContentModalSprint()}
+                </Modal>
+                <Modal
+                    title={"Create sprint"}
+                    wrapClassName={'modalAddProject'}
+                    open={isModalCreateSprintOpen}
+                    onCancel={handleCancel}
+                    footer={false}
+                    getContainer={triggerNode => triggerNode}
+                >
+                    {renderContentModalCreateSprint()}
+                </Modal>
+                <Modal
+                    title="Create task"
+                    wrapClassName={'modalAddTaskmy'}
+                    open={isModalCreateTaskOpen}
+                    onCancel={handleCancel}
+                    footer={false}
+                    getContainer={triggerNode => triggerNode}
+                >
+                    {renderContentModalCreateTask()}
+                </Modal>
+            </>
+
+        ) : (
+            <Issues isGetProject={isGetProject} />
+        )
     );
 }
 

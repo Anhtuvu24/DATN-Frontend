@@ -21,9 +21,6 @@ import { marked } from "marked";
 
 dayjs.extend(customParseFormat);
 
-// Images
-import testImage from '../../assets/images/LoginBanner1.png';
-
 // Styles
 import {
     EditDescriptionWrapper,
@@ -35,19 +32,19 @@ import {
     AttachmentsTaskWrapper,
     ActivityWrapper, MentionLabelWrapper,
 } from "./local.styles.js";
-import CKEditorCustom from "../../components/CKEditor";
-import CommentComp from "../../components/CommentComp";
-import TaskInforDetail from "../../components/TaskInforDetail";
+import CKEditorCustom from "../../../../components/CKEditor";
+import CommentComp from "../../../../components/CommentComp";
+import TaskInforDetail from "../../../../components/TaskInforDetail";
 import {useHistory, useLocation, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {getTask, updateTask} from "../../redux/main/actions/task.js";
-import createNotification from "../../utils/notificationHelper.js";
-import {CommentItemWrapper} from "../../components/CommentComp/local.styles.js";
-import {getProject} from "../../redux/main/actions/project.js";
-import FileComp from "../../components/FileComp";
-import {createFile} from "../../redux/main/actions/file.js";
-import AvatarCustom from "../../components/AvatarCustom/index.jsx";
-import {createComment} from "../../redux/main/actions/comment.js";
+import {getTask, updateTask} from "../../../../redux/main/actions/task.js";
+import createNotification from "../../../../utils/notificationHelper.js";
+import {CommentItemWrapper} from "../../../../components/CommentComp/local.styles.js";
+import {getProject} from "../../../../redux/main/actions/project.js";
+import FileComp from "../../../../components/FileComp";
+import {createFile} from "../../../../redux/main/actions/file.js";
+import AvatarCustom from "../../../../components/AvatarCustom/index.jsx";
+import {createComment} from "../../../../redux/main/actions/comment.js";
 
 const exampleHtml = '## Congratulations on setting up CKEditor 5! 🎉\n' +
     '\n' +
@@ -55,11 +52,10 @@ const exampleHtml = '## Congratulations on setting up CKEditor 5! 🎉\n' +
 
 const { getMentions } = Mentions;
 
-function FileDetail() {
+function FileDetail({ taskId, idProject }) {
     const history = useHistory();
     const dispatch = useDispatch();
     const params = useParams();
-    const {id: taskId, idProject } = params;
     const location = useLocation();
     const { id_comment_select } = location.state || {};
     const task = useSelector(state => state.main.entities.task.currentTask) || {};
@@ -99,14 +95,6 @@ function FileDetail() {
     const [form] = Form.useForm();
 
     const itemsBreadcrumb = [
-        {
-            title: loading ? <Skeleton.Button active={true} size={"small"} /> : 'Projects',
-            path: '/home'
-        },
-        {
-            title: loading ? <Skeleton.Button active={true} size={"small"} /> : project?.name,
-            path: `/project/${project?.id}`,
-        },
         {
             title: loading ? <Skeleton.Button active={true} size={"small"} /> : task?.no_task,
             path: `/task/${taskId}`

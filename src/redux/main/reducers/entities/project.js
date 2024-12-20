@@ -84,7 +84,10 @@ function projects(state = {}, action) {
                     }
                     return item;
                 })
-                return newArr;
+                return {
+                    ...state,
+                    data: newArr,
+                }
             } else {
                 return {
                     ...state,

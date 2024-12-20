@@ -15,6 +15,7 @@ const actions = {
   CHANGE_OPEN_KEYS: 'CHANGE_OPEN_KEYS',
   TOGGLE_ALL: 'TOGGLE_ALL',
   CHANGE_CURRENT: 'CHANGE_CURRENT',
+  CHANGE_CURRENT_ADMIN: 'CHANGE_CURRENT_ADMIN',
   CLEAR_MENU: 'CLEAR_MENU',
   toggleAll: (width, height) => {
     const view = getView(width)
@@ -24,5 +25,17 @@ const actions = {
       height,
     }
   },
+  changeCurrent: (key) => {
+    return {
+      type: actions.CHANGE_CURRENT,
+      key
+    }
+  },
+  changeCurrentAdmin: (key) => {
+    return {
+      type: actions.CHANGE_CURRENT_ADMIN,
+      key
+    }
+}
 }
 export default actions

@@ -24,3 +24,19 @@ export function getMe() {
         payload: {},
     }
 }
+
+export function uploadAvatar(id, file) {
+    return {
+        types: [AuthTypes.UPLOAD_AVATAR_REQUEST, AuthTypes.UPLOAD_AVATAR_SUCCESS, AuthTypes.UPLOAD_AVATAR_FAIL],
+        callAPI: () => AuthAPI.uploadAvatar(id, file),
+        payload: {},
+    }
+}
+
+export function updateMe(id, data) {
+    return {
+        types: [AuthTypes.UPDATE_ME_REQUEST, AuthTypes.UPDATE_ME_SUCCESS, AuthTypes.UPDATE_ME_FAIL],
+        callAPI: () => AuthAPI.updateMe(id, data),
+        payload: {},
+    }
+}

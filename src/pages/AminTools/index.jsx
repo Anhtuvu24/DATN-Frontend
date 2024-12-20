@@ -2,8 +2,9 @@ import React, {lazy, Suspense, useEffect} from 'react'
 import { Splitter } from "antd";
 
 // Components
-import DashboardRoutes from "./DashboardRoutes.jsx";
-import Sidebar from "../../components/Sidebar/index.jsx";
+import AdminToolRoutes from "./AdminToolRoutes.jsx";
+import Sidebar from "../../components/SidebarAdmin";
+import {useSelector} from "react-redux";
 
 function Dashboard() {
     return (
@@ -12,7 +13,7 @@ function Dashboard() {
                 <Sidebar />
             </Splitter.Panel>
             <Splitter.Panel>
-                <DashboardRoutes />
+                <AdminToolRoutes />
             </Splitter.Panel>
         </Splitter>
     );

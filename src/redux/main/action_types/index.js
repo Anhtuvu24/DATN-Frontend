@@ -7,6 +7,7 @@ import SprintTypes from './sprint.js';
 import TaskTypes from './task.js';
 import FileTypes from './file.js';
 import CommentTypes from './comment.js';
+import ActionTypes from './action.js';
 
 export {
     AuthTypes,
@@ -18,4 +19,5 @@ export {
     TaskTypes,
     FileTypes,
     CommentTypes,
+    ActionTypes,
 }
