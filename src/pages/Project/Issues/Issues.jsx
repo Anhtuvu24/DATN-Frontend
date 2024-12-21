@@ -1,6 +1,6 @@
 import React, {useMemo, useState} from 'react';
 import {useSelector} from "react-redux";
-import {Breadcrumb, Input, Popover, Select, Skeleton} from "antd";
+import {Avatar, Breadcrumb, Input, Popover, Select, Skeleton} from "antd";
 import {IssuesWrapper, TaskWrapper} from "./local.styles.js";
 import {useHistory} from "react-router-dom";
 import {MdOutlineSearch} from "react-icons/md";
@@ -10,6 +10,7 @@ import {LabelStatusItem} from "../../../components/TaskInforDetail/local.styles.
 import Priority from "../../../components/Priority/index.jsx";
 import dayjs from "dayjs";
 import TaskDetail from "./TaskDetail/index.jsx";
+import {UserOutlined} from "@ant-design/icons";
 
 function Issues({ isGetProject }) {
     const history = useHistory();
@@ -91,6 +92,13 @@ function Issues({ isGetProject }) {
                     prefix={<MdOutlineSearch fontSize={20} color={'#637381'} />}
                 />
                 <Select style={{ width: 200 }} mode={'multiple'} maxTagCount={'responsive'} placeholder={'Assignee'} onChange={onChangeAssignee}>
+                    <Option value={null}>
+                        <SelectOptionItem>
+                            <Avatar size={24} icon={<UserOutlined />} />
+                            <p>No assignee</p>
+                        </SelectOptionItem>
+                    </Option>
+
                     {users.map(item => {
                         return (
                             <Option value={item.id} key={item?.id} >

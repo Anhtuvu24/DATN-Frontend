@@ -15,9 +15,23 @@ import actions from "../../redux/app/actions.js";
 
 const { changeCurrent } = actions;
 
+const items = [
+    {
+        key: 'board',
+        icon: <HiViewBoards />,
+        label: 'Board',
+    },
+    {
+        key: 'issues',
+        icon: <FaTasks />,
+        label: 'Issues',
+    },
+];
+
 function Sidebar() {
     const history = useHistory();
     const dispatch = useDispatch();
+    const currentKey = useSelector(state => state.App?.current);
     const currentProject = useSelector(state => state.main.entities.project?.currentProject) || {};
     const me = useSelector(state => state.main.entities.auth.user) || {};
 
@@ -27,29 +41,17 @@ function Sidebar() {
                 history.push('/account');
                 return;
             case  'board':
-                // history.push('/home')
                 dispatch(changeCurrent(key));
+                history.push(`/project/${currentProject.id}`);
                 return;
             case 'issues':
                 dispatch(changeCurrent(key));
+                history.push(`/project/${currentProject.id}`);
                 return;
             default:
                 return;
         }
     }
-
-    const items = [
-        {
-            key: 'board',
-            icon: <HiViewBoards />,
-            label: 'Board',
-        },
-        {
-            key: 'issues',
-            icon: <FaTasks />,
-            label: 'Issues',
-        },
-    ];
 
     return (
         <SidebarWrapper>
@@ -63,6 +65,7 @@ function Sidebar() {
             <div className={'menuWrapper'}>
                 <Menu
                     defaultSelectedKeys={['board']}
+                    selectedKeys={[currentKey]}
                     mode="inline"
                     items={items}
                     onClick={onClick}

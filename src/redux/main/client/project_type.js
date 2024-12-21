@@ -11,6 +11,26 @@ const ProjectTypeAPI = {
             }
         })
     },
+    addProjectType: function (data) {
+        return axiosInstance.request({
+            method: 'POST',
+            url: `/project-type/add`,
+            data
+        })
+    },
+    updateProjectType: function (data) {
+        return axiosInstance.request({
+            method: 'PUT',
+            url: `/project-type/update`,
+            data
+        })
+    },
+    deleteProjectType: function (id) {
+        return axiosInstance.request({
+            method: 'DELETE',
+            url: `/project-type/delete/${id}`,
+        })
+    },
 }
 
 export default ProjectTypeAPI;

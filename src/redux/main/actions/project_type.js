@@ -12,3 +12,39 @@ export function getProjectTypes(page, limit) {
         payload: {},
     }
 }
+
+export function addProjectType(data) {
+    return {
+        types: [
+            ProjectTypeTypes.ADD_PROJECT_TYPE_REQUEST,
+            ProjectTypeTypes.ADD_PROJECT_TYPE_SUCCESS,
+            ProjectTypeTypes.ADD_PROJECT_TYPE_FAIL
+        ],
+        callAPI: () => ProjectTypeAPI.addProjectType(data),
+        payload: {},
+    }
+}
+
+export function updateProjectType(data) {
+    return {
+        types: [
+            ProjectTypeTypes.UPDATE_PROJECT_TYPE_REQUEST,
+            ProjectTypeTypes.UPDATE_PROJECT_TYPE_SUCCESS,
+            ProjectTypeTypes.UPDATE_PROJECT_TYPE_FAIL
+        ],
+        callAPI: () => ProjectTypeAPI.updateProjectType(data),
+        payload: {},
+    }
+}
+
+export function deleteProjectType(id) {
+    return {
+        types: [
+            ProjectTypeTypes.DELETE_PROJECT_TYPE_REQUEST,
+            ProjectTypeTypes.DELETE_PROJECT_TYPE_SUCCESS,
+            ProjectTypeTypes.DELETE_PROJECT_TYPE_FAIL
+        ],
+        callAPI: () => ProjectTypeAPI.deleteProjectType(id),
+        payload: {id},
+    }
+}

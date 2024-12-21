@@ -20,7 +20,9 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { marked } from "marked";
 
 dayjs.extend(customParseFormat);
+import actions from "../../redux/app/actions.js";
 
+const { changeCurrent } = actions;
 // Images
 import testImage from '../../assets/images/LoginBanner1.png';
 
@@ -101,15 +103,18 @@ function FileDetail() {
     const itemsBreadcrumb = [
         {
             title: loading ? <Skeleton.Button active={true} size={"small"} /> : 'Projects',
-            path: '/home'
+            path: '/home',
+            key: 'home',
         },
         {
             title: loading ? <Skeleton.Button active={true} size={"small"} /> : project?.name,
             path: `/project/${project?.id}`,
+            key: 'projectDetail',
         },
         {
             title: loading ? <Skeleton.Button active={true} size={"small"} /> : task?.no_task,
-            path: `/task/${taskId}`
+            path: `/task/${taskId}`,
+            key: 'taskDetail'
         },
     ];
 
@@ -204,7 +209,10 @@ function FileDetail() {
         })
     }
 
-    const onClickBreadcrumb = (path) => {
+    const onClickBreadcrumb = (path, key) => {
+        if (key === 'projectDetail') {
+            dispatch(changeCurrent('board'));
+        }
         history.push(path);
     }
 
@@ -224,7 +232,7 @@ function FileDetail() {
                         <Breadcrumb>
                             {itemsBreadcrumb.map(item => {
                                 return (
-                                    <Breadcrumb.Item onClick={() => onClickBreadcrumb(item.path)}>{item.title}</Breadcrumb.Item>
+                                    <Breadcrumb.Item onClick={() => onClickBreadcrumb(item.path, item.key)}>{item.title}</Breadcrumb.Item>
                                 )
                             })}
                         </Breadcrumb>
@@ -323,7 +331,7 @@ function FileDetail() {
                                 <div className={'blockAvatar'}>
                                     {loading ?
                                         <Skeleton.Avatar shape={"circle"} size={32} active={true} />
-                                        : <Avatar size={32}>V</Avatar>
+                                        : <AvatarCustom size={32} src={me?.avatar} name={me?.user_name}/>
                                     }
                                 </div>
                                 {loading ? (

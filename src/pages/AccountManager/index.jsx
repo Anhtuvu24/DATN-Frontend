@@ -12,7 +12,7 @@ import {
     Breadcrumb,
     Switch,
     Popover,
-    Menu
+    Menu, Popconfirm
 } from "antd";
 import { PlusOutlined } from '@ant-design/icons';
 import { MdOutlineSearch, MdKeyboardArrowDown } from "react-icons/md";
@@ -24,7 +24,7 @@ import {AccountsManagerWrapper, MoreOption, FormWrapper, SelectRole} from './loc
 import {ContentLayoutWrapper} from "../../components/MainLayout/local.styles.js";
 import {useHistory} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {createUser, getUsers, updateUser} from "../../redux/main/actions/user.js";
+import {createUser, deleteUser, getUsers, updateUser} from "../../redux/main/actions/user.js";
 import createNotification from "../../utils/notificationHelper.js";
 
 const options = [
@@ -41,16 +41,6 @@ const options = [
         label: 'All'
     }
 ];
-const items = [
-    {
-        key: 'edit',
-        label: 'Edit user',
-    },
-    {
-        key: 'move_to_trash',
-        label: 'Move to trash',
-    }
-];
 
 const itemsBreadcrumb = [
     {
@@ -59,7 +49,7 @@ const itemsBreadcrumb = [
     },
     {
         title: 'Accounts',
-        path: '/account'
+        path: '/admin/account'
     },
 ];
 
@@ -82,6 +72,7 @@ function AccountsManager() {
     const [form] = Form.useForm();
     const users = useSelector(state => state.main.entities.user.users) || [];
 
+    const [record, setRecord] = useState(null);
     const [_users, setUsers] = useState([]);
     const [searchName, setSearchName] = useState('');
     const [activeFilter, setActiveFilter] = useState(null);
@@ -105,11 +96,11 @@ function AccountsManager() {
     }, [users])
 
     useEffect(() => {
-        if (searchName && activeFilter === 'all') {
+        if (!searchName && activeFilter === 'all') {
             setUsers(users);
         } else {
             const newUsers = users.filter((item) => {
-                const isSameNameOrGmail = item.user_name?.includes(searchName) || item.gmail?.includes(searchName);
+                const isSameNameOrGmail = item.user_name?.toLowerCase().includes(searchName.toLowerCase().trim()) || item.gmail?.toLowerCase().includes(searchName.toString().trim());
                 const isSameActive = activeFilter === 'active' ? item.is_active == true : activeFilter === 'inactive' ? item.is_active === false : true;
                 return isSameActive && isSameNameOrGmail
             })
@@ -203,7 +194,7 @@ function AccountsManager() {
     }
 
     const onClick = async (_record, event) => {
-
+        setRecord(_record)
     }
 
     const onChangeRole = async (id, value) => {
@@ -219,6 +210,22 @@ function AccountsManager() {
             createNotification('error', 'An error occurred');
         }
     }
+
+    const onConfirmDelete = async () => {
+        const res = await dispatch(deleteUser(record.id));
+        if (res.status !== 200) {
+            createNotification('error', 'Delete user fail');
+        }
+    }
+
+    const items = [
+        {
+            key: 'move_to_trash',
+            label: <Popconfirm title={'Delete this user?'} onConfirm={onConfirmDelete}>
+                <p>Move to trash</p>
+            </Popconfirm>,
+        }
+    ];
 
     const columns = [
         {

@@ -14,7 +14,9 @@ import {useDispatch, useSelector} from "react-redux";
 
 // Actions
 import {getMe, logout} from "../../redux/main/actions/auth.js";
+import actions from "../../redux/app/actions.js";
 
+const { changeCurrent } = actions;
 // Images
 import logoCVS from "../../assets/images/logo-cvs.svg";
 
@@ -61,8 +63,6 @@ function PrivateScreens() {
     const tasksSearch = useSelector(state => state.main.entities.task.searchTasks) || {};
     const noties = useSelector(state => state.main.entities.auth.noties) || {};
     const tasks = me.tasks || [];
-
-    console.log(tasks);
 
     const optionTask = tasks.map(item => {
         const { sprint, id } = item;
@@ -252,6 +252,7 @@ function PrivateScreens() {
     }
 
     const onClickProjectItem = ({item, key, keyPath, domEvent}) => {
+        dispatch(changeCurrent('board'));
         history.push(`/project/${key}`);
     }
 
@@ -364,9 +365,11 @@ function PrivateScreens() {
                         <Route exact={true} path={'/profile'} >
                             <Profile />
                         </Route>
-                        <Route path={'/admin'} >
-                            <DashboardAdmin />
-                        </Route>
+                        {me?.role && (
+                            <Route path={'/admin'} >
+                                <DashboardAdmin />
+                            </Route>
+                        )}
                         <Dashboard />
                     </Switch>
                 </div>

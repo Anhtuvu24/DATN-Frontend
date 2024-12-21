@@ -5,7 +5,9 @@ import { MdOutlineSearch, MdKeyboardArrowDown } from "react-icons/md";
 import { FaStar, FaRegStar  } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
 import { useDebounce } from 'use-debounce';
+import actions from "../../redux/app/actions.js";
 
+const { changeCurrent } = actions;
 // Styles
 import {HomeWrapper, MoreOption, FormWrapper, OpionSelectUser, ProjectName, BoxStar} from './local.styles';
 import { ContentLayoutWrapper } from "../../components/MainLayout/local.styles.js";
@@ -14,33 +16,6 @@ import AvatarCustom from "../../components/AvatarCustom";
 import {useDispatch, useSelector} from "react-redux";
 import {createProject, deleteProject, getProjects, updateProject} from "../../redux/main/actions/project.js";
 import createNotification from "../../utils/notificationHelper.js";
-
-const options = [
-    {
-        label: 'China',
-        value: 'china',
-        emoji: '🇨🇳',
-        desc: 'China (中国)',
-    },
-    {
-        label: 'USA',
-        value: 'usa',
-        emoji: '🇺🇸',
-        desc: 'USA (美国)',
-    },
-    {
-        label: 'Japan',
-        value: 'japan',
-        emoji: '🇯🇵',
-        desc: 'Japan (日本)',
-    },
-    {
-        label: 'Korea',
-        value: 'korea',
-        emoji: '🇰🇷',
-        desc: 'Korea (韩国)',
-    },
-];
 
 const { Option } = Select;
 
@@ -62,10 +37,13 @@ function Home() {
 
     const [recordOption, setRecordOption] = useState(null);
     const [isCreateProject, setIsCreateProject] = useState(false);
+    const [isUpdateProject, setIsUpdateProject] = useState(false);
     const [isGetProjects, setIsGetProjects] = useState(true);
     const [open, setOpen] = useState(false);
+    const [openModalUpdate, setOpenModalUpdate] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
+    const [formUpdate] = Form.useForm();
     const [fileList, setFileList] = useState([]);
 
     const [query, setQuery] = useState({ search: '' });
@@ -75,12 +53,12 @@ function Home() {
         const fetchGetProjects = async () => {
             setIsGetProjects(true);
             const res = await dispatch(getProjects(1, 100, debouncedQuery.search));
-            if (res.status === 200) {
-                setIsGetProjects(false);
+            if (res?.status === 200 || res === undefined) {
+                // setIsGetProjects(false);
             } else {
                 createNotification('error', 'Get projects error');
-                setIsGetProjects(false);
             }
+            setIsGetProjects(false);
         }
         fetchGetProjects();
     }, [debouncedQuery])
@@ -113,6 +91,9 @@ function Home() {
     const showModal = () => {
         setIsModalOpen(true);
     };
+    const showModalUpdate = () => {
+        setOpenModalUpdate(true);
+    };
     const handleOk = async (values) => {
         setIsCreateProject(true);
         const { description, icon, lead, id_type, name, projectKey } = values;
@@ -136,12 +117,156 @@ function Home() {
             setIsModalOpen(false);
         }
     };
+
+    const handleOkUpdate = async (values) => {
+        setIsUpdateProject(true);
+        const { description, icon, lead, id_type, name, projectKey } = values;
+        const res = await dispatch(updateProject({
+            id: recordOption.id,
+            id_type,
+            id_lead: lead,
+            name,
+            key: projectKey,
+            icon: fileList[0]?.originFileObj || null,
+            description
+        }))
+        if (res.status === 201 || res.status === 200) {
+            createNotification('success', 'Update project success!');
+            setIsUpdateProject(false);
+            setOpenModalUpdate(false)
+            setFileList([])
+            formUpdate.resetFields();
+        } else {
+            createNotification('error', 'Update project error!');
+            setIsUpdateProject(false)
+        }
+    };
+
     const handleCancel = () => {
         setIsModalOpen(false);
         setIsCreateProject(false)
         setFileList([])
         form.resetFields();
     };
+
+    const handleCancelUpdate = () => {
+        setOpenModalUpdate(false);
+        setFileList([])
+        // formUpdate.resetFields();
+    };
+
+    const renderContentModalUpdate = () => {
+        return (
+            <FormWrapper
+                form={formUpdate}
+                onFinish={handleOkUpdate}
+            >
+                <Form.Item name='icon' valuePropName="icon" getValueFromEvent={normFile}>
+                    <Upload
+                        accept='.jpg,.png,.jpeg'
+                        listType="picture-card"
+                        showUploadList={{
+                            showPreviewIcon: false,
+                        }}
+                        maxCount={1}
+                        beforeUpload={() => false}
+                        fileList={fileList}
+                        onChange={handleChangeUpload}
+                    >
+                        {fileList.length ? null : (
+                            <AvatarCustom type={'square'} size={90} name={recordOption?.name} src={recordOption?.icon} />
+                        )}
+                    </Upload>
+                </Form.Item>
+                <Form.Item
+                    name='name'
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <Input placeholder={'Project name'} />
+                </Form.Item>
+                <Form.Item
+                    name='projectKey'
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <Input placeholder={'Project key'} />
+                </Form.Item>
+                <Form.Item
+                    name="id_type"
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <Select
+                        showSearch={true}
+                        defaultValue={projectTypes[0]?.id}
+                        placeholder="Select a type"
+                        onChange={onTypeChange}
+                        allowClear
+                        suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}
+                    >
+                        {projectTypes.map((item, index) => {
+                            return (
+                                <Option value={item?.id} key={item?.id}>
+                                    {item.name}
+                                </Option>
+                            )
+                        })}
+                    </Select>
+                </Form.Item>
+                <Form.Item name='description'>
+                    <Input.TextArea placeholder={'Description'} />
+                </Form.Item>
+                <Form.Item
+                    name="lead"
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <Select
+                        showSearch={true}
+                        defaultValue={users[0]?.id}
+                        placeholder="Select a lead"
+                        onChange={onLeadChange}
+                        allowClear
+                        suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}
+                    >
+                        {users.map((item, index) => {
+                            return (
+                                <Option value={item?.id} key={item?.id}>
+                                    <OpionSelectUser>
+                                        <AvatarCustom size={24} name={item?.user_name} src={item?.avatar} />
+                                        <p>{item?.user_name}</p>
+                                    </OpionSelectUser>
+                                </Option>
+                            )
+                        })}
+                    </Select>
+                </Form.Item>
+                <Form.Item>
+                    <Space>
+                        <Button loading={isUpdateProject} type="primary" htmlType="submit">
+                            Save
+                        </Button>
+                        <Button htmlType="button" onClick={handleCancelUpdate}>
+                            Cancel
+                        </Button>
+                    </Space>
+                </Form.Item>
+            </FormWrapper>
+        )
+    }
 
     const renderContentModal = () => {
         return (
@@ -276,11 +401,22 @@ function Home() {
     }
 
     const onRowTable = (record, index) => {
+        dispatch(changeCurrent('board'));
         history.push(`/project/${record.id}`);
     }
 
     const onClick = async (_record, event) => {
         setRecordOption(_record);
+        if (event.key === 'project_setting') {
+            formUpdate.setFieldsValue({
+                name: _record?.name,
+                id_type: _record?.id_type,
+                description: _record?.description,
+                lead: _record?.id_lead,
+                projectKey: _record?.key,
+            })
+            showModalUpdate(true);
+        }
     }
 
     const onConfirmDelete = async () => {
@@ -429,25 +565,9 @@ function Home() {
                             suffix={<MdOutlineSearch fontSize={20} color={'#637381'} />}
                             onChange={onChangeSearch}
                         />
-                        {/*<Select*/}
-                        {/*    mode="multiple"*/}
-                        {/*    suffixIcon={<MdKeyboardArrowDown fontSize={20} color={'#637381'} />}*/}
-                        {/*    placeholder="select one country"*/}
-                        {/*    defaultValue={['china']}*/}
-                        {/*    // onChange={handleChange}*/}
-                        {/*    options={options}*/}
-                        {/*    optionRender={(option) => (*/}
-                        {/*        <Space>*/}
-                        {/*        <span role="img" aria-label={option.data.label}>*/}
-                        {/*          {option.data.emoji}*/}
-                        {/*        </span>*/}
-                        {/*            {option.data.desc}*/}
-                        {/*        </Space>*/}
-                        {/*    )}*/}
-                        {/*/>*/}
                     </div>
                     <Table
-                        loading={isGetProjects}
+                        loading={isGetProjects && projects}
                         size={"small"}
                         columns={columns}
                         dataSource={projects}
@@ -471,6 +591,16 @@ function Home() {
                 getContainer={triggerNode => triggerNode}
             >
                 {renderContentModal()}
+            </Modal>
+            <Modal
+                title={"Update project"}
+                wrapClassName={'modalAddProject'}
+                open={openModalUpdate}
+                onCancel={handleCancelUpdate}
+                footer={false}
+                getContainer={triggerNode => triggerNode}
+            >
+                {renderContentModalUpdate()}
             </Modal>
         </>
     );

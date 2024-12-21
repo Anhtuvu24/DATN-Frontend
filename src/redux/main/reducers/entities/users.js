@@ -35,6 +35,10 @@ function all(state = {}, action) {
                 ...state,
                 [userUpdate.id]: userUpdate
             }
+        case UserTypes.DELETE_USER_SUCCESS:
+            const newAllUser = state;
+            delete newAllUser[action.id];
+            return newAllUser;
         default:
             return state;
     }
@@ -75,6 +79,9 @@ function users(state = [], action) {
                 return item;
             })
             return newUsers2;
+        case UserTypes.DELETE_USER_SUCCESS:
+            const newUsers3 = state.filter(item => item.id !== action.id);
+            return newUsers3;
         default:
             return state;
     }

@@ -5,16 +5,19 @@ import { MdOutlineTransgender, MdOutlinePermIdentity, MdOutlineEmail } from "rea
 import {AboutItem, ProfileWrapper, UserName} from "./local.styles.js";
 import {useDispatch, useSelector} from "react-redux";
 import AvatarCustom from "../../components/AvatarCustom/index.jsx";
-import {Input, Select, Skeleton, Upload} from "antd";
+import {Button, Form, Input, Select, Skeleton, Space, Upload} from "antd";
 import {getMe, uploadAvatar} from "../../redux/main/actions/auth.js";
 import createNotification from "../../utils/notificationHelper.js";
 import {updateUser} from "../../redux/main/actions/user.js";
 import Priority from "../../components/Priority";
 import {useHistory} from "react-router-dom";
+import cvsLogo from "../../assets/images/logo-cvs.svg";
 
 function Profile() {
     const history = useHistory();
     const dispatch = useDispatch();
+    const [isChangePassword, setIsChangePassword] = useState(false);
+    const [visibleChangePassword, setVisibleChangePassword] = useState(false);
     const [userName, setUserName] = useState('');
     const [gender, setGender] = useState('');
     const [role, setRole] = useState('');
@@ -82,6 +85,30 @@ function Profile() {
 
     const onClickProjectItem = (item) => {
         history.push(`/project/${item?.id}`);
+    }
+
+    const onClickChangePassword = () => {
+        setVisibleChangePassword(true);
+    }
+
+    const onCancelChangePassword = () => {
+        setVisibleChangePassword(false);
+    }
+
+    const onFinish = async (values) => {
+        setIsChangePassword(true);
+        const { currentPassword, newPassword } = values;
+        const res = await dispatch(updateUser(me?.id, {
+            password: newPassword,
+            current_password: currentPassword,
+        }));
+        if (res.status === 200) {
+            createNotification('success', 'Change password success');
+            setVisibleChangePassword(false);
+        } else {
+            createNotification('error', res.error);
+        }
+        setIsChangePassword(false);
     }
 
     return (
@@ -184,6 +211,76 @@ function Profile() {
                                     <Skeleton.Input size={"default"} active={true} />
                                 )}
                             </AboutItem>
+                            {visibleChangePassword ? (
+                                <AboutItem>
+                                    <Form
+                                        onFinish={onFinish}
+                                        name="basic"
+                                        style={{
+                                            maxWidth: 600,
+                                            width: '100%'
+                                        }}
+                                        initialValues={{
+                                            remember: true,
+                                        }}
+                                        autoComplete="off"
+                                    >
+                                        <Form.Item
+                                            name="currentPassword"
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message: 'Please input your currrent password!',
+                                                },
+
+                                            ]}
+                                        >
+                                            <Input.Password placeholder={'Enter current password'} />
+                                        </Form.Item>
+
+                                        <Form.Item
+                                            name="newPassword"
+                                            dependencies={['currentPassword']}
+                                            hasFeedback
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message: 'Please confirm your new password!',
+                                                },
+                                                {
+                                                    pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                                                    message: 'Include 8 characters, at least 1 uppercase letter, 1 number, and 1 special character.',
+                                                },
+                                                // ({ getFieldValue }) => ({
+                                                //     validator(_, value) {
+                                                //         if (!value || getFieldValue('currentPassword') === value) {
+                                                //             return Promise.resolve();
+                                                //         }
+                                                //         return Promise.reject(new Error('The two passwords do not match!'));
+                                                //     },
+                                                // }),
+                                            ]}
+                                        >
+                                            <Input.Password placeholder={'Enter new password'} />
+                                        </Form.Item>
+
+                                        <Form.Item label={null}>
+                                            <Space wrap>
+                                                <Button loading={isChangePassword} type="primary" htmlType="submit">
+                                                    Save
+                                                </Button>
+                                                <Button onClick={onCancelChangePassword} type="text">
+                                                    Cancel
+                                                </Button>
+                                            </Space>
+                                        </Form.Item>
+                                    </Form>
+                                </AboutItem>
+                            ) : (
+                                <AboutItem>
+                                    <Button onClick={onClickChangePassword}>Change password</Button>
+                                </AboutItem>
+                            )}
                         </div>
                     </div>
                     <div className={'rightWrapper'}>

@@ -40,3 +40,11 @@ export function createUser(data) {
         payload: {}
     }
 }
+
+export function deleteUser(id) {
+    return {
+        types: [UserTypes.DELETE_USER_REQUEST, UserTypes.DELETE_USER_SUCCESS, UserTypes.DELETE_USER_FAIL],
+        callAPI: () => UserAPI.delelteUser(id),
+        payload: {id}
+    }
+}

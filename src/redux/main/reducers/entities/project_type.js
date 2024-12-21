@@ -11,6 +11,22 @@ function all(state = {}, action) {
                 ...state,
                 ...obj
             };
+        case ProjectTypeTypes.ADD_PROJECT_TYPE_SUCCESS:
+            const { projectType: newProjectType } = action.data;
+            return {
+                ...state,
+                [newProjectType.id]: newProjectType
+            };
+        case ProjectTypeTypes.DELETE_PROJECT_TYPE_SUCCESS:
+            const newProjectTypes1 = state;
+            delete newProjectTypes1[action.id];
+            return newProjectTypes1;
+        case ProjectTypeTypes.UPDATE_PROJECT_TYPE_SUCCESS:
+            const { projectType: newProjectType2 } = action.data;
+            return {
+                ...state,
+                [newProjectType2.id]: newProjectType2
+            };
         default:
             return state;
     }
@@ -24,6 +40,30 @@ function project_types(state = {}, action) {
                 ...state,
                 data,
                 pagination
+            };
+        case ProjectTypeTypes.ADD_PROJECT_TYPE_SUCCESS:
+            const { projectType: newProjectType } = action.data;
+            return {
+                ...state,
+                data: [...state.data, newProjectType],
+            };
+        case ProjectTypeTypes.DELETE_PROJECT_TYPE_SUCCESS:
+            const newProjectTypes1 = state.data.filter(item => item.id !== action.id);
+            return {
+                ...state,
+                data: newProjectTypes1
+            };
+        case ProjectTypeTypes.UPDATE_PROJECT_TYPE_SUCCESS:
+            const { projectType: newProjectType2 } = action.data;
+            const newProjectTypes2 = state.data.map(item => {
+                if (item.id === newProjectType2.id) {
+                    return newProjectType2;
+                }
+                return item;
+            });
+            return {
+                ...state,
+                data: newProjectTypes2
             };
         default:
             return state;

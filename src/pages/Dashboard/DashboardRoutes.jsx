@@ -8,7 +8,7 @@ const Page404 = lazy(() => import('../404.jsx'));
 
 const privateRoutes = [
     {
-        path: 'project/:id',
+        path: 'project/:idProject',
         component: lazy(() => import('../Project')),
         exact: true,
     },

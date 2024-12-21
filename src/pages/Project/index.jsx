@@ -13,6 +13,7 @@ import {
     Upload,
     Popconfirm, Skeleton
 } from "antd";
+import { UserOutlined } from '@ant-design/icons';
 import { SlOptions } from "react-icons/sl";
 import { MdOutlineSearch, MdUpload } from "react-icons/md";
 import { DragDropContext } from 'react-beautiful-dnd';
@@ -45,6 +46,9 @@ import createNotification from "../../utils/notificationHelper.js";
 import {createTask, getTasks, updateOrderTask} from "../../redux/main/actions/task.js";
 import AvatarCustom from "../../components/AvatarCustom/index.jsx";
 import Issues from "./Issues/Issues.jsx";
+import actions from "../../redux/app/actions.js";
+
+const { changeCurrent } = actions;
 
 const items = [
     {
@@ -86,7 +90,7 @@ function Project() {
     const dispatch = useDispatch();
     const history = useHistory();
     const params = useParams();
-    const projectId = params.id;
+    const projectId = params.idProject;
 
     const [isGetProject, setIsGetProject] = useState(false);
     const [isCreateTask, setIsCreateTask] = useState(false);
@@ -127,6 +131,12 @@ function Project() {
             path: `/project/${currentProject?.id}`
         },
     ];
+
+    useEffect(() => {
+        if (!currentKey) {
+            dispatch(changeCurrent('board'));
+        }
+    }, [currentKey])
 
     useEffect(() => {
         const getTasksFetch = async () => {
@@ -180,11 +190,18 @@ function Project() {
     };
 
     const onSelect = (item) => {
-        if (usersSelect.includes(item.id)) {
-            const newArr = usersSelect.filter((i, index) => i !== item.id)
-            setUsersSelect(newArr)
+        if (usersSelect.includes(item?.id || null)) {
+            if (item === null) {
+                const newArr = usersSelect.filter((i, index) => i !== null);
+                setUsersSelect(newArr);
+            } else if (item) {
+                const newArr = usersSelect.filter((i, index) => i !== item?.id);
+                setUsersSelect(newArr);
+            }
+        } else if (item === null) {
+            setUsersSelect(prev => [...prev, null]);
         } else {
-            setUsersSelect(prev => ([...usersSelect, item.id]))
+            setUsersSelect(prev => ([...usersSelect, item?.id]))
         }
     }
 
@@ -255,12 +272,12 @@ function Project() {
         const listFileOri = upload && upload.map(item => item.originFileObj);
         const data = {
             id_status: record,
-            id_assignee: assignee,
+            ...(assignee !== 'noAssignee' && { id_assignee: assignee }),
             id_reporter: me.id,
             id_sprint: active_sprints[0].id,
             name,
             priority,
-            description,
+            ...(description && { description: assignee }),
             expired_at: dayjs(expriedDate).format('YYYY-MM-DD'),
             files: listFileOri,
         }
@@ -419,7 +436,7 @@ function Project() {
                 }}
                 onFinish={onCreateTask}
                 initialValues={{
-                    assignee: users[0]?.id,
+                    assignee: 'noAssignee',
                     priority: 'medium'
                 }}
             >
@@ -453,7 +470,13 @@ function Project() {
                         },
                     ]}
                 >
-                    <Select defaultValue={users[0]?.id} style={{ height: 40 }} suffixIcon={false} showSearch={true}>
+                    <Select defaultValue={'noAssignee'} style={{ height: 40 }} suffixIcon={false} showSearch={true}>
+                        <Option value={'noAssignee'}>
+                            <SelectOptionItem>
+                                <Avatar size={24} icon={<UserOutlined />} />
+                                <p>No assignee</p>
+                            </SelectOptionItem>
+                        </Option>
                         {users.map(item => {
                             return (
                                 <Option value={item.id} key={item?.id}>
@@ -595,7 +618,7 @@ function Project() {
     }
 
     return (
-        currentKey === 'board' ? (
+        (currentKey === 'board' || !currentKey) ? (
             <>
                 <ProjectDetailWrapper>
                     <Breadcrumb>
@@ -650,6 +673,9 @@ function Project() {
                                     prefix={<MdOutlineSearch fontSize={20} color={'#637381'} />}
                                 />
                                 <div className={'listUser'}>
+                                    <UserItem is_select={usersSelect.includes(null) || undefined} onClick={() => onSelect(null)} className={'userItem'}>
+                                        <Avatar size={32} icon={<UserOutlined />} />
+                                    </UserItem>
                                     {users.map((item, index) => {
                                         return (
                                             <UserItem key={`user-${index}`} is_select={usersSelect.includes(item.id) || undefined} onClick={() => onSelect(item)} className={'userItem'}>

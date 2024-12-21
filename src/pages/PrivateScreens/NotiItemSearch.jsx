@@ -14,7 +14,7 @@ function NotiItemSearch({ item, setIsOpenNoti }) {
     const history = useHistory();
     const { ref, inView } = useInView({
         triggerOnce: true,
-        threshold: 0,
+        threshold: 0.1,
     });
     const { userAction, task, comment, type_agent } = item;
     const statuses = useSelector(state => state.main.entities.status.statuses) || [];
@@ -67,14 +67,14 @@ function NotiItemSearch({ item, setIsOpenNoti }) {
                 )}
             </div>
         ) : (
-            <div className={'notiItem'} key={item.id} onClick={() => onClickNotiItem(item)}>
+            <div ref={ref} className={'notiItem'} key={item.id} onClick={() => onClickNotiItem(item)}>
                 {inView && (
                     <>
                         <div className={'boxAvatar'}>
                             <AvatarCustom size={32} name={userAction.user_name} src={userAction.avatar} />
                         </div>
                         <div className={'notiContent'}>
-                            <p className={'notiName'} title={item.name}>{item.name} • {task.no_task}</p>
+                            <p className={'notiName'} title={item.name}>{item.name} • {task.no_task} <span>{timeAgo(item?.created_at)}</span></p>
                             <p className={'commentContent'}>{comment?.text}</p>
                         </div>
                         <div className={'buttonRead'}>

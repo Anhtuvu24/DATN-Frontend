@@ -63,6 +63,7 @@ export const ProfileWrapper = styled.div`
         height: 100%;
         padding: 80px 20px 0;
         .aboutUser {
+          max-width: 315px;
           box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25), 0 0 1px 1px rgba(9, 30, 66, 0.13);
           border-radius: 8px;
           margin-bottom: 24px;

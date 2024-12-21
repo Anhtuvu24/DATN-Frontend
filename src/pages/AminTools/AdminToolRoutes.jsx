@@ -12,6 +12,11 @@ const privateRoutes = [
         component: lazy(() => import('../AccountManager')),
         exact: true,
     },
+    {
+        path: '/project-type',
+        component: lazy(() => import('../ProjectTypeManager')),
+        exact: true,
+    },
 ]
 
 function AdminDashboardRoutes() {

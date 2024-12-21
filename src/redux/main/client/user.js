@@ -45,6 +45,12 @@ const UserAPI = {
             url: 'users/add-user',
             data
         })
+    },
+    delelteUser: function (id) {
+        return axiosInstance.request({
+            method: 'DELETE',
+            url: `users/delete-user/${id}`,
+        })
     }
 }
 

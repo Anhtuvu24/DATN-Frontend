@@ -1,5 +1,8 @@
 import React, {useState} from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import actions from "../../../redux/app/actions.js";
+
+const { changeCurrent } = actions;
 
 // Styles
 import { TaskWrapper } from './local.styles.js';
@@ -14,13 +17,12 @@ import createNotification from "../../../utils/notificationHelper.js";
 import {deleteTask} from "../../../redux/main/actions/task.js";
 import Priority from "../../../components/Priority";
 import {useHistory, useParams} from "react-router-dom";
-
-
+import {UserOutlined} from "@ant-design/icons";
 
 function Task({ id, index, task, isHidden }) {
     if (!task) return null
     const params = useParams();
-    const projectId = params.id;
+    const projectId = params.idProject;
     const history = useHistory();
     const dispatch = useDispatch();
     const [open, setOpen] = useState(false);
@@ -53,6 +55,7 @@ function Task({ id, index, task, isHidden }) {
     ];
 
     const onClickItem = () => {
+        dispatch(changeCurrent(null));
         history.push(`/project/${projectId}/task/${task.id}`);
     }
 
@@ -96,7 +99,11 @@ function Task({ id, index, task, isHidden }) {
                     </div>
                     <div className={'footer'}>
                         <div className={'footerLeft'}>
-                            <AvatarCustom size={24} name={user.user_name} src={user.avatar} />
+                            {task.id_assignee ? (
+                                <AvatarCustom size={24} name={user.user_name} src={user.avatar} />
+                            ) : (
+                                <Avatar size={24} icon={<UserOutlined />} />
+                            )}
                             <Priority type={task.priority} />
                         </div>
                         <p>Expired: {dayjs(task.expired_at).format('DD/MM')}</p>

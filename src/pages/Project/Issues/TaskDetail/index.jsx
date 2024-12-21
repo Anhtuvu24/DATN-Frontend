@@ -311,7 +311,7 @@ function FileDetail({ taskId, idProject }) {
                                 <div className={'blockAvatar'}>
                                     {loading ?
                                         <Skeleton.Avatar shape={"circle"} size={32} active={true} />
-                                        : <Avatar size={32}>V</Avatar>
+                                        : <AvatarCustom size={32} src={me?.avatar} name={me?.user_name}/>
                                     }
                                 </div>
                                 {loading ? (

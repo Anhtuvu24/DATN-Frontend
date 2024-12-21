@@ -42,10 +42,24 @@ const ProjectAPI = {
         });
     },
     updateProject: function (data) {
+        const { icon, id, ..._data } = data;
+        const formData = new FormData();
+        if (icon) {
+            formData.append('icon', icon);
+
+        }
+        for (const key in _data) {
+            if (_data.hasOwnProperty(key)) {
+                formData.append(key, _data[key]);
+            }
+        }
         return axiosInstance.request({
             method: 'PUT',
-            url: `/project/update/${data.id}`,
-            data
+            url: `/project/update/${id}`,
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+            data: formData
         })
     },
     deleteProject: function (ids) {
