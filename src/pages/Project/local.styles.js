@@ -50,7 +50,7 @@ export const ProjectDetailWrapper = styled.div`
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding-bottom: 24px;
+    margin-bottom: 24px;
     .tasksContainer {
       flex: 1;
       display: flex;

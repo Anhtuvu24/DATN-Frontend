@@ -140,7 +140,6 @@ function FileDetail() {
             setEditorContent(description);
         }
     }, [loading])
-
     const handleEditorChange = (content) => {
         setEditorContent(content);
     };

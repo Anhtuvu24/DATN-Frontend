@@ -7,6 +7,9 @@ export const LoginWrapper = styled.div`
   .banner {
     flex: 1;
     padding: 40px;
+    @media only screen and (max-width: 768px) {
+      display: none;
+    }
     > div {
       display: flex;
       align-items: center;

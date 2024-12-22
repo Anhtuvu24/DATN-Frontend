@@ -277,7 +277,7 @@ function Project() {
             id_sprint: active_sprints[0].id,
             name,
             priority,
-            ...(description && { description: assignee }),
+            ...(description && { description: description }),
             expired_at: dayjs(expriedDate).format('YYYY-MM-DD'),
             files: listFileOri,
         }

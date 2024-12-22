@@ -35,6 +35,12 @@ export const DescriptionWrapper = styled.div`
 export const DescriptionContent = styled.div`
   padding: 8px;
   border-radius: 4px;
+  ol, ul {
+    margin-left: 40px;
+  }
+  ol {
+    list-style: auto !important;
+  }
   &:hover {
     background-color: #091E420F;
   }
