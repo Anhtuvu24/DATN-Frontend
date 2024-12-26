@@ -34,7 +34,7 @@ import {
 } from "./local.styles.js";
 import CKEditorCustom from "../../../../components/CKEditor";
 import CommentComp from "../../../../components/CommentComp";
-import TaskInforDetail from "../../../../components/TaskInforDetail";
+import TaskInforDetail from "../TaskInforDetail";
 import {useHistory, useLocation, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {getTask, updateTask} from "../../../../redux/main/actions/task.js";
@@ -97,7 +97,7 @@ function FileDetail({ taskId, idProject }) {
     const itemsBreadcrumb = [
         {
             title: loading ? <Skeleton.Button active={true} size={"small"} /> : task?.no_task,
-            path: `/task/${taskId}`
+            path: `/project/${idProject}/task/${taskId}`
         },
     ];
 
@@ -384,7 +384,7 @@ function FileDetail({ taskId, idProject }) {
                     </MainContentWrapper>
                 </Splitter.Panel>
                 <Splitter.Panel min={240}>
-                    <TaskInforDetail loading={loading} />
+                    <TaskInforDetail taskId={taskId} idProject={idProject} loading={loading} />
                 </Splitter.Panel>
             </Splitter>
         </FileDetailContainer>

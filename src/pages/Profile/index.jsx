@@ -74,7 +74,7 @@ function Profile() {
         setGender(value);
         const res = await dispatch(updateUser(me?.id, { gender: value }));
         if (res.status !== 200) {
-            createNotification('error', 'Changed name fail');
+            createNotification('error', 'Changed gender fail');
             setGender(me?.gender);
         }
     }

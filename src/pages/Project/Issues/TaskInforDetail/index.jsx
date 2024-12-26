@@ -1,21 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {Avatar, Collapse, DatePicker, Select, Skeleton} from 'antd';
-import { MdKeyboardArrowDown } from "react-icons/md";
+import {Collapse, DatePicker, Select, Skeleton} from "antd";
+import {
+    DetailsWrapper,
+    LabelStatusItem,
+    PriorityOption,
+    SelectOptionItem
+} from "../../../../components/TaskInforDetail/local.styles.js";
+import Priority from "../../../../components/Priority/index.jsx";
 import {useDispatch, useSelector} from "react-redux";
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-
-dayjs.extend(customParseFormat);
-// Styles
-import {DetailsWrapper, LabelStatusItem, PriorityOption, SelectOptionItem} from "./local.styles.js";
-
-// Utils
-import {timeAgo} from "../../utils/helper.js";
-import AvatarCustom from "../AvatarCustom/index.jsx";
-import {updateTask} from "../../redux/main/actions/task.js";
 import {useParams} from "react-router-dom";
-import createNotification from "../../utils/notificationHelper.js";
-import Priority from "../Priority";
+import React, {useEffect, useState} from "react";
+import {updateTask} from "../../../../redux/main/actions/task.js";
+import createNotification from "../../../../utils/notificationHelper.js";
+import {MdKeyboardArrowDown} from "react-icons/md";
+import AvatarCustom from "../../../../components/AvatarCustom/index.jsx";
+import dayjs from "dayjs";
+import {timeAgo} from "../../../../utils/helper.js";
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -35,10 +34,8 @@ const priorityOption = [
     },
 ]
 
-function TaskInforDetail({ loading }) {
+function TaskInforDetail({ taskId, idProject, loading }) {
     const dispatch = useDispatch();
-    const params = useParams();
-    const {id: taskId, idProject } = params;
     const task = useSelector(state => state.main.entities.task.currentTask) || {};
     const {
         sprint,
@@ -72,7 +69,7 @@ function TaskInforDetail({ loading }) {
     const itemStatusSelect = statuses.find(item => item.id === statusValue);
     const colorItem = itemStatusSelect?.name === 'TO DO' ? { color: '#44546F', bgColor: '#091E420F'}
         : itemStatusSelect?.name === 'DONE' ? { color: '#216E4E', bgColor: '#DCFFF1'}
-        : { color: '#0055CC', bgColor: '#E9F2FF'};
+            : { color: '#0055CC', bgColor: '#E9F2FF'};
 
     useEffect(() => {
         if (!loading) {

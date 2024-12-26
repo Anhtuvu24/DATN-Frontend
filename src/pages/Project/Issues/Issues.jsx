@@ -41,7 +41,7 @@ function Issues({ isGetProject }) {
             _task = [..._task, ...item.tasks];
         });
         return _task;
-    }, [categories])
+    }, [categories, tasks])
     const itemsBreadcrumb = [
         {
             title: isGetProject ? <Skeleton.Button active={true} size={"small"} /> : 'Projects',
@@ -62,6 +62,7 @@ function Issues({ isGetProject }) {
     }
 
     const onChangeAssignee = (value, option) => {
+        setListAssignee(value);
         setListAssignee(value);
     }
 

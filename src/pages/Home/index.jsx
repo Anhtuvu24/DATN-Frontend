@@ -388,7 +388,7 @@ function Home() {
                 </Form.Item>
                 <Form.Item>
                     <Space>
-                        <Button loading={isCreateProject} type="primary" htmlType="submit">
+                        <Button disabled={me.role === 'employee'} loading={isCreateProject} type="primary" htmlType="submit">
                             Create
                         </Button>
                         <Button htmlType="button" onClick={handleCancel}>
@@ -556,7 +556,7 @@ function Home() {
                 <HomeWrapper>
                     <div className={'headerWrapper'}>
                         <h1>Projects</h1>
-                        <Button onClick={showModal} type={"primary"}>Create project</Button>
+                        <Button disabled={me.role === 'employee'} onClick={showModal} type={"primary"}>Create project</Button>
                     </div>
                     <div className={'searchsWrapper'}>
                         <Input

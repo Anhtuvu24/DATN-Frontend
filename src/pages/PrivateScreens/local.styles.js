@@ -204,3 +204,17 @@ export const DropDownButton = styled.div`
     color: #44546F;
   }
 `
+
+export const NodataMenu = styled.div`
+  padding: 4px;
+  list-style-type: none;
+  background-color: #ffffff;
+  background-clip: padding-box;
+  border-radius: 4px;
+  outline: none;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+`
